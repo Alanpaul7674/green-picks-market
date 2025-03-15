@@ -1,10 +1,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, Send, X, ShoppingBag } from 'lucide-react';
+import { MessageSquare, Send, X } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Product } from './ProductCard';
-import { getProductsByCategory } from '../utils/productData';
 import { Link } from 'react-router-dom';
+import { getChatCompletion, getRecommendedProducts } from '../utils/openaiService';
 
 interface Message {
   id: string;
@@ -13,23 +13,12 @@ interface Message {
   products?: Product[];
 }
 
-enum ChatStage {
-  Initial,
-  CategorySelected,
-  PreferenceSelected,
-  SizeSelected,
-  Recommendations
-}
-
 const ProductChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
-  const [chatStage, setChatStage] = useState<ChatStage>(ChatStage.Initial);
-  const [category, setCategory] = useState<string | null>(null);
-  const [preference, setPreference] = useState<string | null>(null);
-  const [size, setSize] = useState<string | null>(null);
-  const [suggestedProducts, setSuggestedProducts] = useState<Product[]>([]);
+  const [chatHistory, setChatHistory] = useState<{ role: string; content: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -40,7 +29,7 @@ const ProductChatbot: React.FC = () => {
       setMessages([
         {
           id: '1',
-          text: "👋 Hi there! I'm your ECOSwap assistant. I can help you find sustainable fashion items. What are you looking for today? (Women's clothing, Men's clothing, or Accessories)",
+          text: "👋 Hi there! I'm your ECOSwap assistant. I can help you find sustainable fashion items. What are you looking for today?",
           sender: 'bot'
         }
       ]);
@@ -65,8 +54,8 @@ const ProductChatbot: React.FC = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleSend = () => {
-    if (!inputText.trim()) return;
+  const handleSend = async () => {
+    if (!inputText.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -76,129 +65,51 @@ const ProductChatbot: React.FC = () => {
 
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
+    setIsLoading(true);
 
-    // Process user input based on current chat stage
-    setTimeout(() => {
-      processUserInput(inputText);
-    }, 500);
-  };
+    // Add user message to chat history
+    const updatedHistory = [...chatHistory, { role: 'user', content: inputText }];
+    setChatHistory(updatedHistory);
 
-  const processUserInput = (input: string) => {
-    const lowerInput = input.toLowerCase();
+    try {
+      // Show typing indicator
+      const typingId = Date.now().toString() + '-typing';
+      setMessages(prev => [...prev, { id: typingId, text: '...', sender: 'bot' }]);
 
-    switch (chatStage) {
-      case ChatStage.Initial:
-        if (lowerInput.includes('women') || lowerInput.includes('woman') || lowerInput.includes('female')) {
-          setCategory('women');
-          setChatStage(ChatStage.CategorySelected);
-          askForPreference('women');
-        } else if (lowerInput.includes('men') || lowerInput.includes('man') || lowerInput.includes('male')) {
-          setCategory('men');
-          setChatStage(ChatStage.CategorySelected);
-          askForPreference('men');
-        } else if (lowerInput.includes('accessory') || lowerInput.includes('accessories')) {
-          setCategory('accessories');
-          setChatStage(ChatStage.CategorySelected);
-          askForPreference('accessories');
-        } else {
-          // If category not recognized, ask again
-          addBotMessage("I'm not sure I understand. Are you looking for Women's clothing, Men's clothing, or Accessories?");
-        }
-        break;
-
-      case ChatStage.CategorySelected:
-        // Process preferences (sustainable, low carbon, price)
-        setPreference(lowerInput);
-        setChatStage(ChatStage.PreferenceSelected);
-        askForSize();
-        break;
-
-      case ChatStage.PreferenceSelected:
-        // Process size preference
-        setSize(lowerInput);
-        setChatStage(ChatStage.Recommendations);
-        provideRecommendations();
-        break;
-
-      case ChatStage.Recommendations:
-        // Handle follow-up questions or start over
-        if (lowerInput.includes('thank') || lowerInput.includes('thanks')) {
-          addBotMessage("You're welcome! Happy sustainable shopping! Is there anything else I can help you with?");
-        } else if (lowerInput.includes('yes') || lowerInput.includes('start over') || lowerInput.includes('new')) {
-          setChatStage(ChatStage.Initial);
-          setCategory(null);
-          setPreference(null);
-          setSize(null);
-          addBotMessage("Let's start over! What are you looking for today? (Women's clothing, Men's clothing, or Accessories)");
-        } else if (lowerInput.includes('no') || lowerInput.includes('bye')) {
-          addBotMessage("Alright! Feel free to ask if you need anything else. Happy sustainable shopping!");
-        } else {
-          addBotMessage("I'd be happy to help you find something else or refine these recommendations. Would you like to start a new search?");
-        }
-        break;
+      // Get response from OpenAI
+      const aiResponse = await getChatCompletion(updatedHistory);
+      
+      // Remove typing indicator
+      setMessages(prev => prev.filter(m => m.id !== typingId));
+      
+      // Extract recommended products
+      const recommendedProducts = getRecommendedProducts(aiResponse);
+      
+      // Add bot response to chat history
+      setChatHistory([...updatedHistory, { role: 'assistant', content: aiResponse }]);
+      
+      // Add bot message with response
+      const botMessage: Message = {
+        id: Date.now().toString(),
+        text: aiResponse,
+        sender: 'bot',
+        products: recommendedProducts.length > 0 ? recommendedProducts : undefined
+      };
+      
+      setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      toast({
+        title: "Connection error",
+        description: "Could not connect to the assistant. Please try again.",
+        variant: "destructive"
+      });
+      
+      // Remove typing indicator
+      setMessages(prev => prev.filter(m => m.id !== Date.now().toString() + '-typing'));
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const askForPreference = (category: string) => {
-    const categoryText = category === 'accessories' ? category : `${category}'s clothing`;
-    addBotMessage(`Great! What kind of ${categoryText} are you looking for? Please describe your preferences (sustainable materials, low carbon footprint, price range, etc.)`);
-  };
-
-  const askForSize = () => {
-    addBotMessage("What size are you looking for? (XS, S, M, L, XL)");
-  };
-
-  const provideRecommendations = () => {
-    // Filter products based on category
-    let products = getProductsByCategory(category || 'women');
-    
-    // Further filter based on preference (simple keyword matching)
-    if (preference) {
-      const lowerPreference = preference.toLowerCase();
-      
-      // Filter by sustainability if mentioned
-      if (lowerPreference.includes('sustainable') || lowerPreference.includes('eco')) {
-        products = products.filter(p => p.isSustainable);
-      }
-      
-      // Filter by carbon footprint if mentioned
-      if (lowerPreference.includes('carbon') || lowerPreference.includes('footprint') || lowerPreference.includes('green')) {
-        products = products.sort((a, b) => a.carbonFootprint - b.carbonFootprint);
-      }
-      
-      // Filter by price mentions
-      if (lowerPreference.includes('cheap') || lowerPreference.includes('inexpensive') || lowerPreference.includes('low price')) {
-        products = products.sort((a, b) => a.price - b.price);
-      } else if (lowerPreference.includes('expensive') || lowerPreference.includes('high end') || lowerPreference.includes('premium')) {
-        products = products.sort((a, b) => b.price - a.price);
-      }
-    }
-    
-    // Take top 3 products
-    const topProducts = products.slice(0, 3);
-    setSuggestedProducts(topProducts);
-    
-    // Add bot message with recommendations
-    addBotMessage(
-      `Based on your preferences, I recommend these items. These have been selected with sustainability in mind:`,
-      topProducts
-    );
-    
-    // Add follow-up question
-    setTimeout(() => {
-      addBotMessage("Would you like to see more options or refine your search?");
-    }, 1000);
-  };
-
-  const addBotMessage = (text: string, products?: Product[]) => {
-    const botMessage: Message = {
-      id: Date.now().toString(),
-      text: text,
-      sender: 'bot',
-      products
-    };
-    
-    setMessages(prev => [...prev, botMessage]);
   };
 
   return (
@@ -287,10 +198,12 @@ const ProductChatbot: React.FC = () => {
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Type your message..."
               className="flex-1 p-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+              disabled={isLoading}
             />
             <button
               onClick={handleSend}
-              className="ml-2 bg-primary text-white rounded-md p-2"
+              className={`ml-2 bg-primary text-white rounded-md p-2 ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/90'}`}
+              disabled={isLoading}
             >
               <Send className="h-5 w-5" />
             </button>
