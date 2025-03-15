@@ -11,6 +11,7 @@ import MenPage from "./pages/MenPage";
 import AccessoriesPage from "./pages/AccessoriesPage";
 import AboutPage from "./pages/AboutPage";
 import NotFound from "./pages/NotFound";
+import ProductChatbot from "./components/ProductChatbot";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <ProductChatbot />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

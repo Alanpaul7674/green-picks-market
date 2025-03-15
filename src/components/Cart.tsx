@@ -24,15 +24,19 @@ const Cart: React.FC = () => {
     if (savedCart) {
       setItems(JSON.parse(savedCart));
     }
-    
+  }, []);
+  
+  useEffect(() => {
     // Calculate sustainability points based on carbon footprint
-    const points = items.reduce((total, item) => {
-      // Lower carbon footprint = more points
-      const itemPoints = Math.round((15 - item.product.carbonFootprint) * 10) * item.quantity;
-      return total + (itemPoints > 0 ? itemPoints : 0);
-    }, 0);
-    
-    setSustainabilityPoints(points);
+    if (items.length > 0) {
+      const points = items.reduce((total, item) => {
+        // Lower carbon footprint = more points
+        const itemPoints = Math.round((15 - item.product.carbonFootprint) * 10) * item.quantity;
+        return total + (itemPoints > 0 ? itemPoints : 0);
+      }, 0);
+      
+      setSustainabilityPoints(points);
+    }
   }, [items]);
 
   const toggleCart = () => {
