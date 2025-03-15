@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react';
 import { Product } from './ProductCard';
-import { Leaf, Truck, RotateCcw, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { Leaf, Truck, RotateCcw, ChevronDown, ChevronUp, Sparkles, ShoppingCart } from 'lucide-react';
 import RecommendedProducts from './RecommendedProducts';
+import { useToast } from '@/components/ui/use-toast';
+import CarbonScoreCircle from './CarbonScoreCircle';
 
 interface ProductDetailProps {
   product: Product;
@@ -13,6 +15,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [expandedSection, setExpandedSection] = useState<string | null>("sustainability");
+  const { toast } = useToast();
 
   const toggleSection = (section: string) => {
     if (expandedSection === section) {
@@ -32,17 +35,42 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
 
   const carbonInfo = getCarbonLevel(product.carbonFootprint);
 
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      toast({
+        title: "Please select a size",
+        description: "You need to select a size before adding to cart",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    toast({
+      title: "Added to cart",
+      description: `${quantity} × ${product.name} (${selectedSize}) added to your cart`,
+      action: (
+        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10">
+          <ShoppingCart className="h-3 w-3 text-primary" />
+        </div>
+      )
+    });
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-16">
         {/* Product Images */}
         <div className="space-y-4">
-          <div className="aspect-square rounded-xl overflow-hidden bg-secondary">
+          <div className="aspect-square rounded-xl overflow-hidden bg-secondary relative">
             <img 
               src={product.image} 
               alt={product.name} 
               className="w-full h-full object-cover"
             />
+            {/* Add Carbon Score Circle to corner of image */}
+            <div className="absolute top-4 right-4">
+              <CarbonScoreCircle score={product.carbonFootprint} />
+            </div>
           </div>
         </div>
 
@@ -127,7 +155,11 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
             </div>
             
             {/* Add to Cart */}
-            <button className="w-full py-3 px-6 bg-primary text-white font-medium rounded-lg hover:shadow-md transition-all mb-6">
+            <button 
+              className="w-full py-3 px-6 bg-primary text-white font-medium rounded-lg hover:shadow-md transition-all mb-6 flex items-center justify-center gap-2"
+              onClick={handleAddToCart}
+            >
+              <ShoppingCart className="w-4 h-4" />
               Add to Cart
             </button>
             

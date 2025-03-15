@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Leaf, ChevronRight } from 'lucide-react';
+import CarbonScoreCircle from './CarbonScoreCircle';
 
 export interface Product {
   id: number;
@@ -64,11 +65,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             )}
           </div>
           
-          {/* Carbon Footprint Indicator */}
-          <div className="absolute bottom-3 left-3">
-            <div className={`px-2 py-1 text-xs font-medium rounded-full flex items-center ${carbonColor}`}>
-              <span>Carbon: {carbonLevel}</span>
-            </div>
+          {/* Carbon Score Circle */}
+          <div className="absolute top-3 right-3">
+            <CarbonScoreCircle 
+              score={product.carbonFootprint} 
+              size="sm" 
+              showLabel={false} 
+            />
           </div>
           
           {/* Quick View Button */}
