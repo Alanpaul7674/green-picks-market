@@ -45,6 +45,30 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
       return;
     }
 
+    // Get existing cart from localStorage
+    const existingCart = localStorage.getItem('cart');
+    let cartItems = existingCart ? JSON.parse(existingCart) : [];
+    
+    // Check if the same product with the same size is already in cart
+    const existingItemIndex = cartItems.findIndex(
+      (item: any) => item.product.id === product.id && item.size === selectedSize
+    );
+    
+    if (existingItemIndex >= 0) {
+      // Update quantity if item already exists
+      cartItems[existingItemIndex].quantity += quantity;
+    } else {
+      // Add new item
+      cartItems.push({
+        product,
+        quantity,
+        size: selectedSize
+      });
+    }
+    
+    // Save updated cart to localStorage
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+
     toast({
       title: "Added to cart",
       description: `${quantity} × ${product.name} (${selectedSize}) added to your cart`,

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { ArrowRight, Leaf } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -68,13 +67,13 @@ const Hero: React.FC = () => {
           
           <div className="flex flex-wrap gap-4">
             <Link 
-              to="/women" 
+              to="/shop" 
               className="px-6 py-3 rounded-lg bg-primary text-white font-medium transition-all hover:shadow-lg hover:translate-y-[-2px]"
             >
-              Shop Women
+              Shop Now
             </Link>
             <Link 
-              to="/men" 
+              to="/about" 
               className="px-6 py-3 rounded-lg bg-white/10 backdrop-blur-sm text-white font-medium transition-all hover:bg-white/20 hover:shadow-lg hover:translate-y-[-2px] flex items-center"
             >
               Learn More

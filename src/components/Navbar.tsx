@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingBag, Menu, X } from 'lucide-react';
+import { Search, Menu, X } from 'lucide-react';
+import Cart from './Cart';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -62,12 +63,7 @@ const Navbar: React.FC = () => {
             <button className="p-2 rounded-full hover:bg-accent transition-colors">
               <Search className="w-5 h-5" />
             </button>
-            <Link to="/cart" className="p-2 rounded-full hover:bg-accent transition-colors relative">
-              <ShoppingBag className="w-5 h-5" />
-              <span className="absolute top-0 right-0 bg-primary text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                0
-              </span>
-            </Link>
+            <Cart />
             <button 
               className="md:hidden p-2 rounded-full hover:bg-accent transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
