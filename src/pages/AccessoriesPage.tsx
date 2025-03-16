@@ -17,12 +17,23 @@ const AccessoriesPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const fetchedProducts = getProductsByCategory('accessories');
-    setProducts(fetchedProducts);
-    setFilteredProducts(fetchedProducts);
+    const fetchProducts = async () => {
+      try {
+        const fetchedProducts = getProductsByCategory('accessories');
+        console.log('Fetched accessories products:', fetchedProducts);
+        setProducts(fetchedProducts);
+        setFilteredProducts(fetchedProducts);
+      } catch (error) {
+        console.error('Error fetching accessories products:', error);
+      }
+    };
+    
+    fetchProducts();
   }, []);
 
   useEffect(() => {
+    if (products.length === 0) return;
+    
     let result = [...products];
     
     // Apply price filter

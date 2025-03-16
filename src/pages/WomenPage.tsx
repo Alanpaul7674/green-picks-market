@@ -17,12 +17,23 @@ const WomenPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const fetchedProducts = getProductsByCategory('women');
-    setProducts(fetchedProducts);
-    setFilteredProducts(fetchedProducts);
+    const fetchProducts = async () => {
+      try {
+        const fetchedProducts = getProductsByCategory('women');
+        console.log('Fetched women products:', fetchedProducts);
+        setProducts(fetchedProducts);
+        setFilteredProducts(fetchedProducts);
+      } catch (error) {
+        console.error('Error fetching women products:', error);
+      }
+    };
+    
+    fetchProducts();
   }, []);
 
   useEffect(() => {
+    if (products.length === 0) return;
+    
     let result = [...products];
     
     // Apply price filter

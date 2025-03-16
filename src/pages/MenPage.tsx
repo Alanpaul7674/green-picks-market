@@ -17,12 +17,23 @@ const MenPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const fetchedProducts = getProductsByCategory('men');
-    setProducts(fetchedProducts);
-    setFilteredProducts(fetchedProducts);
+    const fetchProducts = async () => {
+      try {
+        const fetchedProducts = getProductsByCategory('men');
+        console.log('Fetched men products:', fetchedProducts);
+        setProducts(fetchedProducts);
+        setFilteredProducts(fetchedProducts);
+      } catch (error) {
+        console.error('Error fetching men products:', error);
+      }
+    };
+    
+    fetchProducts();
   }, []);
 
   useEffect(() => {
+    if (products.length === 0) return;
+    
     let result = [...products];
     
     // Apply price filter
