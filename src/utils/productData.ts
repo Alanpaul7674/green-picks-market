@@ -150,6 +150,28 @@ export const getNewArrivals = (limit: number = 4): Product[] => {
 };
 
 export const getProductsByCategory = (category: string, limit?: number): Product[] => {
-  const filteredProducts = products.filter(p => p.category === category);
+  // Fix: Making category case-insensitive to handle any capitalization
+  const normalizedCategory = category.toLowerCase();
+  const filteredProducts = products.filter(p => p.category.toLowerCase() === normalizedCategory);
+  
+  if (filteredProducts.length === 0) {
+    console.warn(`No products found for category: ${category}`);
+  }
+  
   return limit ? filteredProducts.slice(0, limit) : filteredProducts;
+};
+
+// New function: Get products with lowest carbon footprint across all categories
+export const getLowCarbonProducts = (limit: number = 4): Product[] => {
+  return [...products]
+    .sort((a, b) => a.carbonFootprint - b.carbonFootprint)
+    .slice(0, limit);
+};
+
+// New function: Get sustainable products
+export const getSustainableProducts = (limit: number = 4): Product[] => {
+  return products
+    .filter(p => p.isSustainable)
+    .sort((a, b) => a.carbonFootprint - b.carbonFootprint)
+    .slice(0, limit);
 };
