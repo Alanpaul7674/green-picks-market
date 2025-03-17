@@ -12,6 +12,7 @@ import MenPage from "./pages/MenPage";
 import AccessoriesPage from "./pages/AccessoriesPage";
 import AboutPage from "./pages/AboutPage";
 import LoginPage from "./pages/LoginPage";
+import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
 import ProductChatbot from "./components/ProductChatbot";
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/men" element={<MenPage />} />
             <Route path="/accessories" element={<AccessoriesPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/shop" element={<WomenPage />} /> {/* Shop redirects to women for now */}
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

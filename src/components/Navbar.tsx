@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import Cart from './Cart';
 import NavbarAccountSection from './NavbarAccountSection';
+import Search from './Search';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -61,9 +62,7 @@ const Navbar: React.FC = () => {
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            <button className="p-2 rounded-full hover:bg-accent transition-colors">
-              <Search className="w-5 h-5" />
-            </button>
+            <Search />
             <NavbarAccountSection />
             <Cart />
             <button 

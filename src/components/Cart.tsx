@@ -86,6 +86,11 @@ const Cart: React.FC = () => {
       return;
     }
     
+    // Update total sustainability points in localStorage
+    const currentPoints = parseInt(localStorage.getItem('sustainabilityPoints') || '0', 10);
+    const newTotalPoints = currentPoints + sustainabilityPoints;
+    localStorage.setItem('sustainabilityPoints', newTotalPoints.toString());
+    
     toast({
       title: "Order placed successfully!",
       description: `You've earned ${sustainabilityPoints} sustainability points with this purchase!`,

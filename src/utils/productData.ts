@@ -202,6 +202,169 @@ export const products: Product[] = [
     carbonFootprint: 6.8,
     isSustainable: true,
     isNew: true
+  },
+  {
+    id: 21,
+    name: "Linen Summer Dress",
+    brand: "EcoBasics",
+    price: 89.99,
+    image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1376&q=80",
+    category: "Women",
+    carbonFootprint: 4.8,
+    isSustainable: true
+  },
+  {
+    id: 22,
+    name: "Organic Cotton Blouse",
+    brand: "GreenThread",
+    price: 69.99,
+    image: "https://images.unsplash.com/photo-1624607066206-bf47464a9240?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1480&q=80",
+    category: "Women",
+    carbonFootprint: 5.2,
+    isSustainable: true
+  },
+  {
+    id: 23,
+    name: "Recycled Cashmere Sweater",
+    brand: "NatureWear",
+    price: 159.99,
+    image: "https://images.unsplash.com/photo-1576566588028-4147f3842259?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1364&q=80",
+    category: "Women",
+    carbonFootprint: 7.6,
+    isSustainable: true,
+    isNew: true
+  },
+  {
+    id: 24,
+    name: "Hemp Blend Jumpsuit",
+    brand: "EcoBasics",
+    price: 119.99,
+    image: "https://images.unsplash.com/photo-1552574681-c4145c26661d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1480&q=80",
+    category: "Women",
+    carbonFootprint: 6.5,
+    isSustainable: true
+  },
+  {
+    id: 25,
+    name: "Organic Linen Shorts",
+    brand: "GreenThread",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1591369822096-ffd140ec948f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+    category: "Women",
+    carbonFootprint: 4.4,
+    isSustainable: true
+  },
+  {
+    id: 26,
+    name: "Tencel Maxi Skirt",
+    brand: "NatureWear",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1577900232427-18219b9166a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1370&q=80",
+    category: "Women",
+    carbonFootprint: 5.7,
+    isNew: true
+  },
+  {
+    id: 27,
+    name: "Hemp Blend Button-Up",
+    brand: "EcoBasics",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1602810316693-3667c854239a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+    category: "Men",
+    carbonFootprint: 5.6,
+    isSustainable: true
+  },
+  {
+    id: 28,
+    name: "Recycled Denim Jacket",
+    brand: "GreenThread",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1611312449412-6cefac5dc3e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1376&q=80",
+    category: "Men",
+    carbonFootprint: 8.2,
+    isSustainable: true
+  },
+  {
+    id: 29,
+    name: "Organic Linen Shorts",
+    brand: "NatureWear",
+    price: 69.99,
+    image: "https://images.unsplash.com/photo-1592914622650-3edabf30c744?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+    category: "Men",
+    carbonFootprint: 4.8,
+    isSustainable: true,
+    isNew: true
+  },
+  {
+    id: 30,
+    name: "Sustainable Swim Trunks",
+    brand: "EcoBasics",
+    price: 49.99,
+    image: "https://images.unsplash.com/photo-1565128939020-a8c8af3c491b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1376&q=80",
+    category: "Men",
+    carbonFootprint: 3.9,
+    isSustainable: true
+  },
+  {
+    id: 31,
+    name: "Recycled Polyester Vest",
+    brand: "GreenThread",
+    price: 89.99,
+    image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1336&q=80",
+    category: "Men",
+    carbonFootprint: 5.4,
+    isNew: true
+  },
+  {
+    id: 32,
+    name: "Recycled Silver Earrings",
+    brand: "NatureWear",
+    price: 39.99,
+    image: "https://images.unsplash.com/photo-1630020453498-927ab119e4e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+    category: "Accessories",
+    carbonFootprint: 2.7,
+    isSustainable: true
+  },
+  {
+    id: 33,
+    name: "Organic Cotton Tote Bag",
+    brand: "EcoBasics",
+    price: 29.99,
+    image: "https://images.unsplash.com/photo-1597456485367-d1d53a7a5997?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1376&q=80",
+    category: "Accessories",
+    carbonFootprint: 2.2,
+    isSustainable: true
+  },
+  {
+    id: 34,
+    name: "Sustainable Bamboo Watch",
+    brand: "GreenThread",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+    category: "Accessories",
+    carbonFootprint: 3.5,
+    isSustainable: true,
+    isNew: true
+  },
+  {
+    id: 35,
+    name: "Recycled Plastic Belt",
+    brand: "NatureWear",
+    price: 44.99,
+    image: "https://images.unsplash.com/photo-1584302179602-e4c3d3fd629d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1380&q=80",
+    category: "Accessories",
+    carbonFootprint: 2.9,
+    isSustainable: true
+  },
+  {
+    id: 36,
+    name: "Cork Yoga Mat",
+    brand: "EcoBasics",
+    price: 69.99,
+    image: "https://images.unsplash.com/photo-1518609571773-39b7d303a87b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+    category: "Accessories",
+    carbonFootprint: 4.1,
+    isSustainable: true
   }
 ];
 
