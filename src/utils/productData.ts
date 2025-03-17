@@ -1,4 +1,3 @@
-
 import { Product } from '../components/ProductCard';
 
 export const products: Product[] = [
@@ -121,6 +120,88 @@ export const products: Product[] = [
     carbonFootprint: 4.1,
     isSustainable: true,
     isNew: true
+  },
+  {
+    id: 13,
+    name: "Recycled Polyester Dress",
+    brand: "GreenThread",
+    price: 119.99,
+    image: "https://images.unsplash.com/photo-1623609163841-5e69d8c62cc7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1336&q=80",
+    category: "Women",
+    carbonFootprint: 5.8,
+    isSustainable: true
+  },
+  {
+    id: 14,
+    name: "Organic Cotton Hoodie",
+    brand: "EcoBasics",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+    category: "Men",
+    carbonFootprint: 6.5,
+    isSustainable: true
+  },
+  {
+    id: 15,
+    name: "Recycled Leather Wallet",
+    brand: "NatureWear",
+    price: 49.99,
+    image: "https://images.unsplash.com/photo-1627123424574-724758594e93?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+    category: "Accessories",
+    carbonFootprint: 3.0,
+    isSustainable: true
+  },
+  {
+    id: 16,
+    name: "Hemp Summer Hat",
+    brand: "GreenThread",
+    price: 35.99,
+    image: "https://images.unsplash.com/photo-1565839534177-e84a869eb27f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+    category: "Accessories",
+    carbonFootprint: 2.5,
+    isSustainable: true,
+    isNew: true
+  },
+  {
+    id: 17,
+    name: "Sustainable Chino Pants",
+    brand: "EcoBasics",
+    price: 89.99,
+    image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1397&q=80",
+    category: "Men",
+    carbonFootprint: 7.3,
+    isSustainable: true
+  },
+  {
+    id: 18,
+    name: "Recycled Denim Skirt",
+    brand: "GreenThread",
+    price: 69.99,
+    image: "https://images.unsplash.com/photo-1561932850-4b65ce092609?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+    category: "Women",
+    carbonFootprint: 5.5,
+    isSustainable: true
+  },
+  {
+    id: 19,
+    name: "Eco-Friendly Sunglasses",
+    brand: "NatureWear",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1380&q=80",
+    category: "Accessories",
+    carbonFootprint: 3.8,
+    isNew: true
+  },
+  {
+    id: 20,
+    name: "Organic Cotton Cardigan",
+    brand: "EcoBasics",
+    price: 99.99,
+    image: "https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1372&q=80",
+    category: "Women",
+    carbonFootprint: 6.8,
+    isSustainable: true,
+    isNew: true
   }
 ];
 
@@ -150,7 +231,6 @@ export const getNewArrivals = (limit: number = 4): Product[] => {
 };
 
 export const getProductsByCategory = (category: string, limit?: number): Product[] => {
-  // Fix: Making category case-insensitive to handle any capitalization
   const normalizedCategory = category.toLowerCase();
   const filteredProducts = products.filter(p => p.category.toLowerCase() === normalizedCategory);
   
@@ -161,14 +241,12 @@ export const getProductsByCategory = (category: string, limit?: number): Product
   return limit ? filteredProducts.slice(0, limit) : filteredProducts;
 };
 
-// New function: Get products with lowest carbon footprint across all categories
 export const getLowCarbonProducts = (limit: number = 4): Product[] => {
   return [...products]
     .sort((a, b) => a.carbonFootprint - b.carbonFootprint)
     .slice(0, limit);
 };
 
-// New function: Get sustainable products
 export const getSustainableProducts = (limit: number = 4): Product[] => {
   return products
     .filter(p => p.isSustainable)

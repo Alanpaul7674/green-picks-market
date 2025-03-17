@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -7,10 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/context/AuthContext";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isLoggedIn, login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   
   // Login form state
@@ -23,17 +25,34 @@ const LoginPage = () => {
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState("");
   const [registerName, setRegisterName] = useState("");
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/");
+    }
+  }, [isLoggedIn, navigate]);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
+    // Basic validation
+    if (!loginEmail || !loginPassword) {
+      setIsLoading(false);
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
     
     // Simulate login (in a real app, you would call an API)
     setTimeout(() => {
       setIsLoading(false);
       
-      // For demo purposes, any email/password combo works
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userEmail", loginEmail);
+      // Use the AuthContext login function to manage state
+      login(loginEmail);
       
       toast({
         title: "Success",
@@ -49,6 +68,16 @@ const LoginPage = () => {
     setIsLoading(true);
     
     // Basic validation
+    if (!registerEmail || !registerPassword || !registerConfirmPassword) {
+      setIsLoading(false);
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (registerPassword !== registerConfirmPassword) {
       setIsLoading(false);
       toast({
@@ -63,10 +92,8 @@ const LoginPage = () => {
     setTimeout(() => {
       setIsLoading(false);
       
-      // Store user data in localStorage (for demo)
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userEmail", registerEmail);
-      localStorage.setItem("userName", registerName);
+      // Use the AuthContext login function to manage state
+      login(registerEmail, registerName);
       
       toast({
         title: "Account created",
@@ -81,7 +108,7 @@ const LoginPage = () => {
     <div className="container flex items-center justify-center min-h-screen py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+          <CardTitle className="text-2xl font-bold">Welcome to ECOSwap</CardTitle>
           <CardDescription>
             Enter your credentials to access your account
           </CardDescription>
@@ -140,7 +167,6 @@ const LoginPage = () => {
                     placeholder="John Doe" 
                     value={registerName}
                     onChange={(e) => setRegisterName(e.target.value)}
-                    required
                   />
                 </div>
                 <div className="space-y-2">

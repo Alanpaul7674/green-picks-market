@@ -1,6 +1,6 @@
 
 import React from "react";
-import { AccountButton } from "@/components/AccountButton";
+import AccountButton from "@/components/AccountButton";
 
 const NavbarAccountSection = () => {
   return (
