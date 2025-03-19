@@ -52,13 +52,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     return fallbacks[category] || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=60';
   };
 
+  // Store image URL in localStorage for consistent display across pages
+  const saveImageUrl = () => {
+    const imageToStore = imageError ? getFallbackImage(product.category) : product.image;
+    localStorage.setItem(`product_image_${product.id}`, imageToStore);
+  };
+
   return (
     <div 
       className="group relative rounded-xl overflow-hidden transition-all duration-300 bg-white"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link to={`/product/${product.id}`}>
+      <Link to={`/product/${product.id}`} onClick={saveImageUrl}>
         <div className="aspect-[3/4] overflow-hidden relative">
           <img 
             src={imageError ? getFallbackImage(product.category) : product.image} 

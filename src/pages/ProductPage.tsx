@@ -24,8 +24,20 @@ const ProductPage = () => {
         const productData = getProductById(parseInt(id));
         
         if (productData) {
-          setProduct(productData);
-          setRelatedProducts(getRelatedProducts(productData));
+          // Check if we have a saved image for this product
+          const savedImage = localStorage.getItem(`product_image_${productData.id}`);
+          if (savedImage) {
+            // Use the saved image to ensure consistency
+            const productWithSavedImage = {
+              ...productData,
+              image: savedImage
+            };
+            setProduct(productWithSavedImage);
+            setRelatedProducts(getRelatedProducts(productWithSavedImage));
+          } else {
+            setProduct(productData);
+            setRelatedProducts(getRelatedProducts(productData));
+          }
         } else {
           // Product not found
           navigate('/not-found');

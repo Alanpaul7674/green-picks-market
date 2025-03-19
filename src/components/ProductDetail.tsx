@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Product } from './ProductCard';
 import { Leaf, Truck, RotateCcw, ChevronDown, ChevronUp, Sparkles, ShoppingCart } from 'lucide-react';
 import RecommendedProducts from './RecommendedProducts';
@@ -14,10 +15,19 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [expandedSection, setExpandedSection] = useState<string | null>("sustainability");
+  const [productImage, setProductImage] = useState<string>(product.image);
   const { toast } = useToast();
 
   // Convert price to Indian Rupees (adjusted to keep prices under 2000)
   const priceInRupees = Math.min(1999, Math.round(product.price * 20)).toFixed(0);
+
+  useEffect(() => {
+    // Retrieve saved image URL if available
+    const savedImage = localStorage.getItem(`product_image_${product.id}`);
+    if (savedImage) {
+      setProductImage(savedImage);
+    }
+  }, [product.id]);
 
   const toggleSection = (section: string) => {
     if (expandedSection === section) {
@@ -25,6 +35,17 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
     } else {
       setExpandedSection(section);
     }
+  };
+
+  // Set of reliable fallback images by category
+  const getFallbackImage = (category: string) => {
+    const fallbacks: Record<string, string> = {
+      'Women': 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=800&q=60',
+      'Men': 'https://images.unsplash.com/photo-1602810316693-3667c854239a?auto=format&fit=crop&w=800&q=60',
+      'Accessories': 'https://images.unsplash.com/photo-1576053139778-7e32f2ae3cfd?auto=format&fit=crop&w=800&q=60'
+    };
+    
+    return fallbacks[category] || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=60';
   };
 
   const sizes = ["XS", "S", "M", "L", "XL"];
@@ -63,9 +84,14 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
       // Update quantity if item already exists
       cartItems[existingItemIndex].quantity += quantity;
     } else {
-      // Add new item
+      // Add new item - ensuring we use the correct image
+      const productToAdd = {
+        ...product,
+        image: productImage // Use the consistent image
+      };
+      
       cartItems.push({
-        product,
+        product: productToAdd,
         quantity,
         size: selectedSize,
         sustainabilityPoints
@@ -100,12 +126,14 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
         <div className="space-y-4">
           <div className="aspect-square rounded-xl overflow-hidden bg-secondary relative">
             <img 
-              src={product.image} 
+              src={productImage} 
               alt={product.name} 
               className="w-full h-full object-cover"
               onError={(e) => {
-                // Fallback image if the original fails to load
-                e.currentTarget.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=60";
+                const fallbackImg = getFallbackImage(product.category);
+                e.currentTarget.src = fallbackImg;
+                setProductImage(fallbackImg);
+                localStorage.setItem(`product_image_${product.id}`, fallbackImg);
                 e.currentTarget.onerror = null; // Prevent infinite loop
               }}
             />
@@ -147,6 +175,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
                   </div>
                   <p className="text-sm text-gray-600">
                     This product has a <span className={`font-medium ${carbonInfo.color}`}>{carbonInfo.level}</span> on the environment
+                  </p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Calculated using the <b>Eco-Index LCA Model</b> - measuring materials, manufacturing, transport, and end-of-life impact.
                   </p>
                 </div>
               </div>
