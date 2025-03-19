@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Leaf, ChevronRight } from 'lucide-react';
@@ -36,8 +35,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     High: 'bg-red-100 text-red-800',
   }[carbonLevel];
 
-  // Convert price to Indian Rupees (1 USD = approximately 75 INR)
-  const priceInRupees = (product.price * 75).toFixed(0);
+  // Convert price to Indian Rupees (adjusted to ensure prices stay reasonable)
+  // Using a conversion factor that keeps prices under ₹2000
+  const priceInRupees = Math.min(1999, Math.round(product.price * 20)).toFixed(0);
 
   return (
     <div 
@@ -51,6 +51,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             src={product.image} 
             alt={product.name}
             className="w-full h-full object-cover transition-all duration-500 ease-out transform group-hover:scale-105"
+            onError={(e) => {
+              // Fallback image if the original fails to load
+              e.currentTarget.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=60";
+              e.currentTarget.onerror = null; // Prevent infinite loop
+            }}
           />
           
           {/* Tags */}

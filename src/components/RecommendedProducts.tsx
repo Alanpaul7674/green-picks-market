@@ -13,11 +13,30 @@ interface RecommendedProductsProps {
 const RecommendedProducts: React.FC<RecommendedProductsProps> = ({ 
   products, 
   currentProduct,
-  title = "More Sustainable Alternatives"
+  title = "Similar Products With Lower Carbon Footprint"
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const [showEmptyState, setShowEmptyState] = useState(false);
+  
+  // Helper function to check if products are actually shirts
+  const isShirt = (product: Product) => {
+    const name = product.name.toLowerCase();
+    return name.includes('shirt') || name.includes('blouse') || name.includes('top');
+  };
+
+  // Get more specific category
+  const getSpecificCategory = () => {
+    if (isShirt(currentProduct)) return 'shirt';
+    if (currentProduct.name.toLowerCase().includes('pant') || 
+        currentProduct.name.toLowerCase().includes('jean') ||
+        currentProduct.name.toLowerCase().includes('trouser')) return 'pant';
+    if (currentProduct.name.toLowerCase().includes('jacket') || 
+        currentProduct.name.toLowerCase().includes('coat')) return 'jacket';
+    return currentProduct.category;
+  };
+
+  const specificCategory = getSpecificCategory();
 
   useEffect(() => {
     // If there are no recommendations, show empty state after a short delay
@@ -40,12 +59,31 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
     }
   };
 
-  // Filter recommendations to include only products in the same category with a lower carbon footprint
-  const recommendations = products.filter(p => 
-    p.id !== currentProduct.id && 
-    p.category === currentProduct.category && 
-    p.carbonFootprint < currentProduct.carbonFootprint
-  );
+  // Filter recommendations based on specific product type and lower carbon footprint
+  const recommendations = products.filter(p => {
+    // Don't include the current product
+    if (p.id === currentProduct.id) return false;
+    
+    // Must be in the same high-level category (Men, Women, Accessories)
+    if (p.category !== currentProduct.category) return false;
+    
+    // If current product is a shirt, suggest other shirts
+    if (specificCategory === 'shirt' && !isShirt(p)) return false;
+    
+    // If current product is pants, suggest other pants
+    if (specificCategory === 'pant' && 
+        !(p.name.toLowerCase().includes('pant') || 
+          p.name.toLowerCase().includes('jean') || 
+          p.name.toLowerCase().includes('trouser'))) return false;
+    
+    // If current product is a jacket, suggest other jackets
+    if (specificCategory === 'jacket' && 
+        !(p.name.toLowerCase().includes('jacket') || 
+          p.name.toLowerCase().includes('coat'))) return false;
+    
+    // Must have lower carbon footprint
+    return p.carbonFootprint < currentProduct.carbonFootprint;
+  });
 
   // Calculate potential carbon savings
   const calculateSavings = (product: Product) => {
@@ -62,7 +100,9 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
           <Leaf className="w-10 h-10 text-primary mx-auto mb-4" />
           <h3 className="text-lg font-medium mb-2">No Lower Carbon Alternatives Found</h3>
           <p className="text-gray-600 mb-4">
-            This product already has one of the lowest carbon footprints in this category!
+            This {specificCategory === currentProduct.category ? 
+              currentProduct.category.toLowerCase() : 
+              specificCategory} already has one of the lowest carbon footprints!
           </p>
         </div>
       </div>
@@ -99,13 +139,22 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
     }
   }, [recommendations]);
 
+  // Determine the subtitle based on the specific category
+  const getSubtitle = () => {
+    if (specificCategory === currentProduct.category) {
+      return `Similar ${currentProduct.category.toLowerCase()} with lower carbon footprint`;
+    } else {
+      return `Similar ${specificCategory}s with lower carbon footprint`;
+    }
+  };
+
   return (
     <div className="relative py-10">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold">{title}</h2>
           <p className="text-sm text-gray-500 mt-1">
-            Similar {currentProduct.category.toLowerCase()} with lower carbon footprint
+            {getSubtitle()}
           </p>
         </div>
         

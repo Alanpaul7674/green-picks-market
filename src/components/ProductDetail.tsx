@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Product } from './ProductCard';
 import { Leaf, Truck, RotateCcw, ChevronDown, ChevronUp, Sparkles, ShoppingCart } from 'lucide-react';
@@ -17,8 +16,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
   const [expandedSection, setExpandedSection] = useState<string | null>("sustainability");
   const { toast } = useToast();
 
-  // Convert price to Indian Rupees (1 USD = approximately 75 INR)
-  const priceInRupees = (product.price * 75).toFixed(0);
+  // Convert price to Indian Rupees (adjusted to keep prices under 2000)
+  const priceInRupees = Math.min(1999, Math.round(product.price * 20)).toFixed(0);
 
   const toggleSection = (section: string) => {
     if (expandedSection === section) {
@@ -49,7 +48,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
     }
 
     // Calculate sustainability points (1 point for each ₹100 spent on sustainable products)
-    const sustainabilityPoints = product.isSustainable ? Math.floor((product.price * 75) / 100) : 0;
+    const sustainabilityPoints = product.isSustainable ? Math.floor(parseInt(priceInRupees) / 100) : 0;
 
     // Get existing cart from localStorage
     const existingCart = localStorage.getItem('cart');
@@ -104,6 +103,11 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
               src={product.image} 
               alt={product.name} 
               className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback image if the original fails to load
+                e.currentTarget.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=60";
+                e.currentTarget.onerror = null; // Prevent infinite loop
+              }}
             />
             {/* Add Carbon Score Circle to corner of image */}
             <div className="absolute top-4 right-4">
@@ -206,7 +210,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
               <div className="mb-6 p-3 bg-primary/10 rounded-lg flex items-center gap-2">
                 <Leaf className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium">
-                  Earn {Math.floor((product.price * 75) / 100)} sustainability points with this purchase
+                  Earn {Math.floor(parseInt(priceInRupees) / 100)} sustainability points with this purchase
                 </span>
               </div>
             )}
@@ -265,8 +269,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
                 
                 {expandedSection === "delivery" && (
                   <div className="pt-2 text-gray-600 text-sm space-y-2">
-                    <p>Free delivery on all orders over ₹3,750.</p>
-                    <p>Express shipping available for ₹749.</p>
+                    <p>Free delivery on all orders over ₹1,000.</p>
+                    <p>Express shipping available for ₹199.</p>
                     <p>Free returns within 30 days of delivery.</p>
                   </div>
                 )}
