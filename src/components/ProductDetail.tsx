@@ -17,6 +17,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
   const [expandedSection, setExpandedSection] = useState<string | null>("sustainability");
   const { toast } = useToast();
 
+  // Convert price to Indian Rupees (1 USD = approximately 75 INR)
+  const priceInRupees = (product.price * 75).toFixed(0);
+
   const toggleSection = (section: string) => {
     if (expandedSection === section) {
       setExpandedSection(null);
@@ -45,6 +48,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
       return;
     }
 
+    // Calculate sustainability points (1 point for each ₹100 spent on sustainable products)
+    const sustainabilityPoints = product.isSustainable ? Math.floor((product.price * 75) / 100) : 0;
+
     // Get existing cart from localStorage
     const existingCart = localStorage.getItem('cart');
     let cartItems = existingCart ? JSON.parse(existingCart) : [];
@@ -62,12 +68,20 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
       cartItems.push({
         product,
         quantity,
-        size: selectedSize
+        size: selectedSize,
+        sustainabilityPoints
       });
     }
     
     // Save updated cart to localStorage
     localStorage.setItem('cart', JSON.stringify(cartItems));
+
+    // Add sustainability points to user's total if the product is sustainable
+    if (sustainabilityPoints > 0) {
+      const currentPoints = localStorage.getItem('sustainabilityPoints');
+      const newPoints = currentPoints ? parseInt(currentPoints, 10) + sustainabilityPoints : sustainabilityPoints;
+      localStorage.setItem('sustainabilityPoints', newPoints.toString());
+    }
 
     toast({
       title: "Added to cart",
@@ -113,7 +127,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
             
             <h1 className="text-2xl md:text-3xl font-semibold mb-4">{product.name}</h1>
             
-            <div className="text-2xl font-bold mb-6">${product.price.toFixed(2)}</div>
+            <div className="text-2xl font-bold mb-6">₹{priceInRupees}</div>
             
             {/* Carbon Footprint */}
             <div className="bg-accent rounded-lg p-5 mb-8">
@@ -187,6 +201,16 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
               Add to Cart
             </button>
             
+            {/* Show Sustainability Points */}
+            {product.isSustainable && (
+              <div className="mb-6 p-3 bg-primary/10 rounded-lg flex items-center gap-2">
+                <Leaf className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium">
+                  Earn {Math.floor((product.price * 75) / 100)} sustainability points with this purchase
+                </span>
+              </div>
+            )}
+            
             {/* Product Info Accordions */}
             <div className="space-y-4 border-t border-border pt-6">
               {/* Sustainability Info */}
@@ -241,8 +265,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, relatedProducts 
                 
                 {expandedSection === "delivery" && (
                   <div className="pt-2 text-gray-600 text-sm space-y-2">
-                    <p>Free delivery on all orders over $50.</p>
-                    <p>Express shipping available for $9.99.</p>
+                    <p>Free delivery on all orders over ₹3,750.</p>
+                    <p>Express shipping available for ₹749.</p>
                     <p>Free returns within 30 days of delivery.</p>
                   </div>
                 )}

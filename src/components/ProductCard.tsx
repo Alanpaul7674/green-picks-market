@@ -36,6 +36,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     High: 'bg-red-100 text-red-800',
   }[carbonLevel];
 
+  // Convert price to Indian Rupees (1 USD = approximately 75 INR)
+  const priceInRupees = (product.price * 75).toFixed(0);
+
   return (
     <div 
       className="group relative rounded-xl overflow-hidden transition-all duration-300 bg-white"
@@ -90,7 +93,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="p-4">
         <div className="mb-1 text-sm text-gray-500">{product.brand}</div>
         <h3 className="font-medium mb-1 truncate">{product.name}</h3>
-        <div className="font-semibold">${product.price.toFixed(2)}</div>
+        <div className="font-semibold">₹{priceInRupees}</div>
       </div>
     </div>
   );

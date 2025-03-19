@@ -45,11 +45,17 @@ const Search = () => {
     navigate(`/product/${product.id}`);
   };
 
+  // Convert price to Indian Rupees (1 USD = approximately 75 INR)
+  const formatPrice = (price: number) => {
+    return `₹${(price * 75).toFixed(0)}`;
+  };
+
   return (
     <>
       <button 
         className="p-2 rounded-full hover:bg-accent transition-colors flex items-center gap-2"
         onClick={() => setOpen(true)}
+        aria-label="Search products"
       >
         <SearchIcon className="w-5 h-5" />
         <span className="text-sm text-muted-foreground hidden md:inline-flex">
@@ -65,6 +71,7 @@ const Search = () => {
           value={query}
           onValueChange={setQuery}
           ref={inputRef}
+          autoFocus
         />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
@@ -84,7 +91,7 @@ const Search = () => {
                 </div>
                 <div className="flex flex-col">
                   <span className="font-medium">{product.name}</span>
-                  <span className="text-xs text-muted-foreground">{product.brand} • ${product.price}</span>
+                  <span className="text-xs text-muted-foreground">{product.brand} • {formatPrice(product.price)}</span>
                 </div>
               </CommandItem>
             ))}

@@ -40,9 +40,11 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
     }
   };
 
-  // Filter recommendations to include only products with a lower carbon footprint
+  // Filter recommendations to include only products in the same category with a lower carbon footprint
   const recommendations = products.filter(p => 
-    p.id !== currentProduct.id && p.carbonFootprint < currentProduct.carbonFootprint
+    p.id !== currentProduct.id && 
+    p.category === currentProduct.category && 
+    p.carbonFootprint < currentProduct.carbonFootprint
   );
 
   // Calculate potential carbon savings
@@ -60,7 +62,7 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
           <Leaf className="w-10 h-10 text-primary mx-auto mb-4" />
           <h3 className="text-lg font-medium mb-2">No Lower Carbon Alternatives Found</h3>
           <p className="text-gray-600 mb-4">
-            This product already has one of the lowest carbon footprints in our collection!
+            This product already has one of the lowest carbon footprints in this category!
           </p>
         </div>
       </div>
@@ -103,7 +105,7 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
         <div>
           <h2 className="text-xl font-semibold">{title}</h2>
           <p className="text-sm text-gray-500 mt-1">
-            Products with lower carbon footprint than your current selection
+            Similar {currentProduct.category.toLowerCase()} with lower carbon footprint
           </p>
         </div>
         
