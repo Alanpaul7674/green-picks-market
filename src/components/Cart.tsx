@@ -1,9 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { X, ShoppingBag, MapPin, Clock, Trophy, Leaf } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import CarbonScoreCircle from './CarbonScoreCircle';
 import { Product } from './ProductCard';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export interface CartItem {
   product: Product;
@@ -17,6 +18,8 @@ const Cart: React.FC = () => {
   const [shippingAddress, setShippingAddress] = useState('');
   const [sustainabilityPoints, setSustainabilityPoints] = useState(0);
   const { toast } = useToast();
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Load cart items from localStorage
@@ -40,6 +43,17 @@ const Cart: React.FC = () => {
   }, [items]);
 
   const toggleCart = () => {
+    if (!isLoggedIn) {
+      // Redirect to login page if user is not logged in
+      navigate('/login');
+      toast({
+        title: "Login required",
+        description: "Please log in to view your cart",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setIsOpen(!isOpen);
   };
 
@@ -115,11 +129,11 @@ const Cart: React.FC = () => {
       >
         <ShoppingBag className="w-5 h-5" />
         <span className="absolute top-0 right-0 bg-primary text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-          {items.reduce((total, item) => total + item.quantity, 0)}
+          {isLoggedIn ? items.reduce((total, item) => total + item.quantity, 0) : 0}
         </span>
       </button>
 
-      {isOpen && (
+      {isOpen && isLoggedIn && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black/50">
           <div className="bg-white w-full max-w-md h-full overflow-auto shadow-xl animate-in slide-in-from-right">
             <div className="sticky top-0 z-20 bg-white border-b border-border px-4 py-3 flex items-center justify-between">

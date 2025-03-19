@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Leaf, ChevronRight } from 'lucide-react';
@@ -21,6 +22,7 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [imageError, setImageError] = useState(false);
   
   const getCarbonLevel = (carbonFootprint: number) => {
     if (carbonFootprint < 5) return 'Low';
@@ -39,6 +41,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   // Using a conversion factor that keeps prices under ₹2000
   const priceInRupees = Math.min(1999, Math.round(product.price * 20)).toFixed(0);
 
+  // Set of reliable fallback images by category
+  const getFallbackImage = (category: string) => {
+    const fallbacks: Record<string, string> = {
+      'Women': 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=800&q=60',
+      'Men': 'https://images.unsplash.com/photo-1602810316693-3667c854239a?auto=format&fit=crop&w=800&q=60',
+      'Accessories': 'https://images.unsplash.com/photo-1576053139778-7e32f2ae3cfd?auto=format&fit=crop&w=800&q=60'
+    };
+    
+    return fallbacks[category] || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=60';
+  };
+
   return (
     <div 
       className="group relative rounded-xl overflow-hidden transition-all duration-300 bg-white"
@@ -48,12 +61,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <Link to={`/product/${product.id}`}>
         <div className="aspect-[3/4] overflow-hidden relative">
           <img 
-            src={product.image} 
+            src={imageError ? getFallbackImage(product.category) : product.image} 
             alt={product.name}
             className="w-full h-full object-cover transition-all duration-500 ease-out transform group-hover:scale-105"
             onError={(e) => {
-              // Fallback image if the original fails to load
-              e.currentTarget.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=60";
+              setImageError(true);
+              e.currentTarget.src = getFallbackImage(product.category);
               e.currentTarget.onerror = null; // Prevent infinite loop
             }}
           />
