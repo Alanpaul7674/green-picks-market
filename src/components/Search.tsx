@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search as SearchIcon } from 'lucide-react';
-import { products } from '@/utils/productData';
+import { getAllProducts } from '@/utils/productData';
 import { Product } from '@/components/ProductCard';
 import {
   CommandDialog,
@@ -16,10 +16,27 @@ import {
 const Search = () => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    // Load products data when component mounts
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const allProducts = await getAllProducts();
+        setProducts(allProducts);
+      } catch (error) {
+        console.error('Error loading products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadProducts();
+    
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
@@ -67,35 +84,43 @@ const Search = () => {
       </button>
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput 
-          placeholder="Search products..." 
+          placeholder={loading ? "Loading products..." : "Search products..."} 
           value={query}
           onValueChange={setQuery}
           ref={inputRef}
           autoFocus
         />
         <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Products">
-            {filteredProducts.slice(0, 10).map((product) => (
-              <CommandItem
-                key={product.id}
-                onSelect={() => handleSelect(product)}
-                className="flex items-center gap-2 py-2"
-              >
-                <div className="w-8 h-8 rounded overflow-hidden">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium">{product.name}</span>
-                  <span className="text-xs text-muted-foreground">{product.brand} • {formatPrice(product.price)}</span>
-                </div>
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          {loading ? (
+            <div className="py-6 text-center text-sm text-muted-foreground">
+              Loading products...
+            </div>
+          ) : (
+            <>
+              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandGroup heading="Products">
+                {filteredProducts.slice(0, 10).map((product) => (
+                  <CommandItem
+                    key={product.id}
+                    onSelect={() => handleSelect(product)}
+                    className="flex items-center gap-2 py-2"
+                  >
+                    <div className="w-8 h-8 rounded overflow-hidden">
+                      <img 
+                        src={product.image} 
+                        alt={product.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{product.name}</span>
+                      <span className="text-xs text-muted-foreground">{product.brand} • {formatPrice(product.price)}</span>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </>
+          )}
         </CommandList>
       </CommandDialog>
     </>

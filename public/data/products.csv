@@ -1,0 +1,17 @@
+
+id,name,brand,price,image,category,carbonFootprint,isNew,isSustainable
+1,Organic Cotton T-Shirt,EcoBasics,29.99,https://images.unsplash.com/photo-1521572163474-6864f9cf17ab,Women,4.2,false,true
+2,Recycled Denim Jeans,GreenThread,89.99,https://images.unsplash.com/photo-1541099649105-f69ad21f3246,Women,7.5,false,true
+3,Hemp Blend Jacket,NatureWear,149.99,https://images.unsplash.com/photo-1591047139829-d91aecb6caea,Women,9.8,true,false
+4,Bamboo Lounge Pants,EcoBasics,59.99,https://images.unsplash.com/photo-1594633312681-425c7b97ccd1,Women,3.5,false,true
+5,Recycled Polyester Shirt,GreenThread,45.99,https://images.unsplash.com/photo-1489987707025-afc232f7ea0f,Men,6.2,false,false
+6,Sustainable Wool Sweater,NatureWear,129.99,https://images.unsplash.com/photo-1620799140408-edc6dcb6d633,Men,10.5,true,false
+7,Organic Linen Blazer,EcoBasics,189.99,https://images.unsplash.com/photo-1611312449408-fcece27cdbb7,Women,8.1,false,true
+8,Recycled Nylon Jacket,GreenThread,159.99,https://images.unsplash.com/photo-1608063615781-e2ef8c73d114,Men,11.2,false,false
+9,Tencel Wrap Dress,NatureWear,119.99,https://images.unsplash.com/photo-1551163943-3f7603ad9ac3,Women,5.9,true,true
+10,Eco-Friendly Sneakers,EcoBasics,79.99,https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a,Accessories,7.8,false,true
+11,Merino Wool Scarf,GreenThread,49.99,https://images.unsplash.com/photo-1520903920243-00d872a2d1c9,Accessories,3.2,false,true
+12,Hemp Canvas Backpack,NatureWear,69.99,https://images.unsplash.com/photo-1546938576-6e6a64f317cc,Accessories,4.1,true,true
+13,Recycled Polyester Dress,GreenThread,119.99,https://images.unsplash.com/photo-1623609163841-5e69d8c62cc7,Women,5.8,false,true
+14,Organic Cotton Hoodie,EcoBasics,79.99,https://images.unsplash.com/photo-1556821840-3a63f95609a7,Men,6.5,false,true
+15,Recycled Leather Wallet,NatureWear,49.99,https://images.unsplash.com/photo-1627123424574-724758594e93,Accessories,3.0,false,true

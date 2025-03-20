@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -18,29 +17,33 @@ const ProductPage = () => {
     window.scrollTo(0, 0);
     setLoading(true);
 
-    // Simulate API fetch with a small delay
-    setTimeout(() => {
-      if (id) {
-        const productData = getProductById(parseInt(id));
-        
-        if (productData) {
-          // Check if we have a saved image for this product
-          const savedImage = localStorage.getItem(`product_image_${productData.id}`);
-          if (savedImage) {
-            // Use the saved image to ensure consistency
-            const productWithSavedImage = {
-              ...productData,
-              image: savedImage
-            };
-            setProduct(productWithSavedImage);
+    const loadProductData = async () => {
+      try {
+        if (id) {
+          const productData = await getProductById(parseInt(id));
+          
+          if (productData) {
+            // Check if we have a saved image for this product
+            const savedImage = localStorage.getItem(`product_image_${productData.id}`);
+            let productToUse = productData;
             
-            // Get related products for the specific product type
-            const related = getRelatedProducts(productWithSavedImage, false);
+            if (savedImage) {
+              // Use the saved image to ensure consistency
+              productToUse = {
+                ...productData,
+                image: savedImage
+              };
+            }
+            
+            setProduct(productToUse);
+            
+            // Get related products
+            const related = await getRelatedProducts(productToUse, false);
             
             // Ensure we have at least some related products
             if (related.length < 3) {
               // Get more products from the same category
-              const moreProducts = getRelatedProducts(productWithSavedImage, true);
+              const moreProducts = await getRelatedProducts(productToUse, true);
               const combinedProducts = [...related];
               
               // Add products not already in the list until we have at least 4
@@ -55,32 +58,21 @@ const ProductPage = () => {
               setRelatedProducts(related);
             }
           } else {
-            setProduct(productData);
-            
-            // Get related products (same as above)
-            const related = getRelatedProducts(productData, false);
-            
-            if (related.length < 3) {
-              const moreProducts = getRelatedProducts(productData, true);
-              const combinedProducts = [...related];
-              
-              moreProducts.forEach(p => {
-                if (!combinedProducts.some(cp => cp.id === p.id) && combinedProducts.length < 8) {
-                  combinedProducts.push(p);
-                }
-              });
-              
-              setRelatedProducts(combinedProducts);
-            } else {
-              setRelatedProducts(related);
-            }
+            // Product not found
+            navigate('/not-found');
           }
-        } else {
-          // Product not found
-          navigate('/not-found');
         }
+      } catch (error) {
+        console.error('Error loading product:', error);
+        navigate('/not-found');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
+    };
+
+    // Add a slight delay to simulate API fetch
+    setTimeout(() => {
+      loadProductData();
     }, 300);
   }, [id, navigate]);
 

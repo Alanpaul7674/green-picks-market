@@ -4,14 +4,20 @@ import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
-import { Leaf, TrendingDown, ShoppingBag } from 'lucide-react';
+import { Leaf, TrendingDown, ShoppingBag, Upload } from 'lucide-react';
 import { getFeaturedProducts, getNewArrivals } from '../utils/productData';
 import CarbonFootprintDetails from '../components/CarbonFootprintDetails';
+import CSVUploader from '../components/CSVUploader';
+import { Product } from '../components/ProductCard';
+import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
-  const featuredProducts = getFeaturedProducts(4);
-  const newArrivals = getNewArrivals(4);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
   const [carbonSavings, setCarbonSavings] = useState(0);
+  const [showCSVUploader, setShowCSVUploader] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -21,17 +27,57 @@ const Index = () => {
     if (savedCarbonFootprint) {
       setCarbonSavings(parseFloat(savedCarbonFootprint));
     }
-  }, []);
+    
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const featured = await getFeaturedProducts(4);
+        const newArrivalsData = await getNewArrivals(4);
+        
+        setFeaturedProducts(featured);
+        setNewArrivals(newArrivalsData);
+      } catch (error) {
+        console.error('Error loading products:', error);
+        
+        toast({
+          title: 'Error Loading Products',
+          description: 'There was an error loading product data',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadProducts();
+  }, [toast]);
 
   return (
     <div className="min-h-screen">
       <Navbar />
       
-      {/* Carbon Savings Indicator - Now using the CarbonFootprintDetails component */}
+      {/* Carbon Savings Indicator */}
       <CarbonFootprintDetails />
       
       {/* Hero Section */}
       <Hero />
+      
+      {/* CSV Uploader Toggle */}
+      <div className="container mx-auto py-4 px-4 md:px-6">
+        <button 
+          onClick={() => setShowCSVUploader(!showCSVUploader)}
+          className="flex items-center text-sm text-primary hover:text-primary/80 transition-colors"
+        >
+          <Upload className="w-4 h-4 mr-1" />
+          {showCSVUploader ? 'Hide CSV Uploader' : 'Upload Custom Product CSV'}
+        </button>
+        
+        {showCSVUploader && (
+          <div className="mt-4">
+            <CSVUploader />
+          </div>
+        )}
+      </div>
       
       {/* Features Section */}
       <section className="py-20 px-4 md:px-6">
@@ -92,13 +138,28 @@ const Index = () => {
             </a>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product, index) => (
-              <div key={product.id} className="slide-in" style={{ animationDelay: `${0.1 * (index + 1)}s` }}>
-                <ProductCard product={product} />
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-white rounded-xl overflow-hidden">
+                  <div className="aspect-[3/4] bg-gray-200 animate-pulse"></div>
+                  <div className="p-4">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse mb-2 w-1/3"></div>
+                    <div className="h-5 bg-gray-200 rounded animate-pulse mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-1/4"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredProducts.map((product, index) => (
+                <div key={product.id} className="slide-in" style={{ animationDelay: `${0.1 * (index + 1)}s` }}>
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
       
@@ -118,13 +179,28 @@ const Index = () => {
             </a>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {newArrivals.map((product, index) => (
-              <div key={product.id} className="slide-in" style={{ animationDelay: `${0.1 * (index + 1)}s` }}>
-                <ProductCard product={product} />
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-white rounded-xl overflow-hidden">
+                  <div className="aspect-[3/4] bg-gray-200 animate-pulse"></div>
+                  <div className="p-4">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse mb-2 w-1/3"></div>
+                    <div className="h-5 bg-gray-200 rounded animate-pulse mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-1/4"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {newArrivals.map((product, index) => (
+                <div key={product.id} className="slide-in" style={{ animationDelay: `${0.1 * (index + 1)}s` }}>
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
       
