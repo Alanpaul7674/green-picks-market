@@ -40,6 +40,7 @@ const ProductPage = () => {
             // Ensure we have at least some related products
             if (related.length < 3) {
               // Add some more products from the same category if needed
+              // Fix: Pass the second parameter as a boolean, not a number
               const moreProducts = getRelatedProducts(productWithSavedImage, true);
               const combinedProducts = [...related];
               
@@ -61,6 +62,7 @@ const ProductPage = () => {
             const related = getRelatedProducts(productData);
             
             if (related.length < 3) {
+              // Fix: Pass the second parameter as a boolean, not a number
               const moreProducts = getRelatedProducts(productData, true);
               const combinedProducts = [...related];
               
