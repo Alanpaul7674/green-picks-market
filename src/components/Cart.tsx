@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, ShoppingBag, MapPin, Clock, Trophy, Leaf } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { X, ShoppingBag, MapPin, Clock, Trophy, Leaf, CreditCard, ChevronRight } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import CarbonScoreCircle from './CarbonScoreCircle';
 import { Product } from './ProductCard';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import PaymentMethods from './PaymentMethods';
 
 export interface CartItem {
   product: Product;
@@ -18,6 +19,8 @@ const Cart: React.FC = () => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [shippingAddress, setShippingAddress] = useState('');
   const [sustainabilityPoints, setSustainabilityPoints] = useState(0);
+  const [checkoutStep, setCheckoutStep] = useState(1); // 1: Cart, 2: Address, 3: Payment
+  const [paymentMethod, setPaymentMethod] = useState('card');
   const { toast } = useToast();
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
@@ -56,6 +59,8 @@ const Cart: React.FC = () => {
     }
     
     setIsOpen(!isOpen);
+    // Reset to the first step when opening cart
+    setCheckoutStep(1);
   };
 
   const removeItem = (index: number) => {
@@ -103,6 +108,36 @@ const Cart: React.FC = () => {
     return getIndustryCarbonAverage() - getTotalCarbonFootprint();
   };
 
+  const nextStep = () => {
+    if (checkoutStep === 1) {
+      if (items.length === 0) {
+        toast({
+          title: "Cart is empty",
+          description: "Please add items to your cart to proceed",
+          variant: "destructive"
+        });
+        return;
+      }
+      setCheckoutStep(2);
+    } else if (checkoutStep === 2) {
+      if (shippingAddress.trim() === '') {
+        toast({
+          title: "Shipping address required",
+          description: "Please enter your shipping address to continue",
+          variant: "destructive"
+        });
+        return;
+      }
+      setCheckoutStep(3);
+    }
+  };
+
+  const previousStep = () => {
+    if (checkoutStep > 1) {
+      setCheckoutStep(checkoutStep - 1);
+    }
+  };
+
   const handleCheckout = () => {
     if (shippingAddress.trim() === '') {
       toast({
@@ -125,7 +160,7 @@ const Cart: React.FC = () => {
     
     toast({
       title: "Order placed successfully!",
-      description: `You've saved ${getCarbonSavings().toFixed(1)} kg CO2e with this purchase!`,
+      description: `Payment completed via ${paymentMethod === 'card' ? 'Credit/Debit Card' : paymentMethod === 'bank' ? 'Net Banking' : 'UPI'}. You've saved ${getCarbonSavings().toFixed(1)} kg CO2e with this purchase!`,
       action: (
         <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10">
           <Leaf className="h-3 w-3 text-primary" />
@@ -137,6 +172,16 @@ const Cart: React.FC = () => {
     setItems([]);
     localStorage.setItem('cart', JSON.stringify([]));
     setIsOpen(false);
+    setCheckoutStep(1);
+  };
+
+  const getStepTitle = () => {
+    switch (checkoutStep) {
+      case 1: return "Shopping Cart";
+      case 2: return "Shipping Information";
+      case 3: return "Payment Method";
+      default: return "Shopping Cart";
+    }
   };
 
   return (
@@ -155,7 +200,17 @@ const Cart: React.FC = () => {
         <div className="fixed inset-0 z-50 flex justify-end bg-black/50">
           <div className="bg-white w-full max-w-md h-full overflow-auto shadow-xl animate-in slide-in-from-right">
             <div className="sticky top-0 z-20 bg-white border-b border-border px-4 py-3 flex items-center justify-between">
-              <h2 className="font-semibold text-lg">Shopping Cart</h2>
+              <div className="flex items-center">
+                {checkoutStep > 1 && (
+                  <button 
+                    className="mr-2 p-1 rounded-full hover:bg-accent transition-colors"
+                    onClick={previousStep}
+                  >
+                    <ChevronRight className="w-5 h-5 rotate-180" />
+                  </button>
+                )}
+                <h2 className="font-semibold text-lg">{getStepTitle()}</h2>
+              </div>
               <button 
                 className="p-2 rounded-full hover:bg-accent transition-colors"
                 onClick={toggleCart}
@@ -165,119 +220,135 @@ const Cart: React.FC = () => {
             </div>
 
             <div className="p-4">
-              {items.length === 0 ? (
-                <div className="text-center py-10">
-                  <ShoppingBag className="w-10 h-10 mx-auto mb-4 text-gray-400" />
-                  <p className="text-gray-500">Your cart is empty</p>
-                  <button 
-                    className="mt-4 px-4 py-2 bg-primary text-white rounded-md"
-                    onClick={toggleCart}
-                  >
-                    Continue Shopping
-                  </button>
-                </div>
-              ) : (
+              {checkoutStep === 1 && (
                 <>
-                  <div className="space-y-4 mb-6">
-                    {items.map((item, index) => (
-                      <div key={`${item.product.id}-${item.size}`} className="flex border border-border rounded-lg p-3">
-                        <div className="w-20 h-20 overflow-hidden rounded-md mr-3">
-                          <img 
-                            src={item.product.image} 
-                            alt={item.product.name} 
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between">
-                            <div>
-                              <h3 className="font-medium text-sm">{item.product.name}</h3>
-                              <p className="text-sm text-gray-500">{item.product.brand}</p>
-                              <p className="text-xs text-gray-500">Size: {item.size}</p>
+                  {items.length === 0 ? (
+                    <div className="text-center py-10">
+                      <ShoppingBag className="w-10 h-10 mx-auto mb-4 text-gray-400" />
+                      <p className="text-gray-500">Your cart is empty</p>
+                      <button 
+                        className="mt-4 px-4 py-2 bg-primary text-white rounded-md"
+                        onClick={toggleCart}
+                      >
+                        Continue Shopping
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="space-y-4 mb-6">
+                        {items.map((item, index) => (
+                          <div key={`${item.product.id}-${item.size}`} className="flex border border-border rounded-lg p-3">
+                            <div className="w-20 h-20 overflow-hidden rounded-md mr-3">
+                              <img 
+                                src={item.product.image} 
+                                alt={item.product.name} 
+                                className="w-full h-full object-cover"
+                              />
                             </div>
-                            <button 
-                              className="text-gray-400 hover:text-gray-600"
-                              onClick={() => removeItem(index)}
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                          <div className="flex justify-between items-center mt-2">
-                            <div className="flex items-center border border-border rounded-md">
-                              <button 
-                                className="w-6 h-6 flex items-center justify-center text-gray-500"
-                                onClick={() => updateQuantity(index, item.quantity - 1)}
-                              >
-                                -
-                              </button>
-                              <span className="w-8 text-center text-sm">{item.quantity}</span>
-                              <button 
-                                className="w-6 h-6 flex items-center justify-center text-gray-500"
-                                onClick={() => updateQuantity(index, item.quantity + 1)}
-                              >
-                                +
-                              </button>
-                            </div>
-                            <div className="flex items-center">
-                              <span className="font-semibold text-sm">₹{convertToRupees(item.product.price * item.quantity)}</span>
-                              <div className="ml-2">
-                                <CarbonScoreCircle score={item.product.carbonFootprint} size="sm" showLabel={false} />
+                            <div className="flex-1">
+                              <div className="flex justify-between">
+                                <div>
+                                  <h3 className="font-medium text-sm">{item.product.name}</h3>
+                                  <p className="text-sm text-gray-500">{item.product.brand}</p>
+                                  <p className="text-xs text-gray-500">Size: {item.size}</p>
+                                </div>
+                                <button 
+                                  className="text-gray-400 hover:text-gray-600"
+                                  onClick={() => removeItem(index)}
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                              <div className="flex justify-between items-center mt-2">
+                                <div className="flex items-center border border-border rounded-md">
+                                  <button 
+                                    className="w-6 h-6 flex items-center justify-center text-gray-500"
+                                    onClick={() => updateQuantity(index, item.quantity - 1)}
+                                  >
+                                    -
+                                  </button>
+                                  <span className="w-8 text-center text-sm">{item.quantity}</span>
+                                  <button 
+                                    className="w-6 h-6 flex items-center justify-center text-gray-500"
+                                    onClick={() => updateQuantity(index, item.quantity + 1)}
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                                <div className="flex items-center">
+                                  <span className="font-semibold text-sm">₹{convertToRupees(item.product.price * item.quantity)}</span>
+                                  <div className="ml-2">
+                                    <CarbonScoreCircle score={item.product.carbonFootprint} size="sm" showLabel={false} />
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </div>
+                        ))}
+                      </div>
+
+                      <div className="bg-accent p-4 rounded-lg mb-6">
+                        <div className="flex items-center mb-3">
+                          <Leaf className="w-4 h-4 text-primary mr-2" />
+                          <h3 className="font-medium">Carbon Impact Summary</h3>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm">Total Carbon Footprint:</span>
+                          <span className="font-semibold">{getTotalCarbonFootprint().toFixed(1)} kg CO2e</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm">Industry Average:</span>
+                          <span className="font-semibold text-gray-500">{getIndustryCarbonAverage().toFixed(1)} kg CO2e</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Your Carbon Savings:</span>
+                          <span className="font-semibold text-green-600">{getCarbonSavings().toFixed(1)} kg CO2e</span>
                         </div>
                       </div>
-                    ))}
-                  </div>
 
-                  <div className="bg-accent p-4 rounded-lg mb-6">
-                    <div className="flex items-center mb-3">
-                      <Leaf className="w-4 h-4 text-primary mr-2" />
-                      <h3 className="font-medium">Carbon Impact Summary</h3>
-                    </div>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm">Total Carbon Footprint:</span>
-                      <span className="font-semibold">{getTotalCarbonFootprint().toFixed(1)} kg CO2e</span>
-                    </div>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm">Industry Average:</span>
-                      <span className="font-semibold text-gray-500">{getIndustryCarbonAverage().toFixed(1)} kg CO2e</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Your Carbon Savings:</span>
-                      <span className="font-semibold text-green-600">{getCarbonSavings().toFixed(1)} kg CO2e</span>
-                    </div>
-                  </div>
+                      <div className="border-t border-border pt-4 mb-6">
+                        <div className="flex justify-between mb-2">
+                          <span className="text-gray-600">Subtotal</span>
+                          <span className="font-semibold">₹{convertToRupees(getTotalPrice())}</span>
+                        </div>
+                        <div className="flex justify-between mb-2">
+                          <span className="text-gray-600">Shipping</span>
+                          <span className="font-semibold">₹99</span>
+                        </div>
+                        <div className="flex justify-between font-semibold text-lg mt-4">
+                          <span>Total</span>
+                          <span>₹{(parseInt(convertToRupees(getTotalPrice())) + 99).toString()}</span>
+                        </div>
+                      </div>
 
-                  <div className="border-t border-border pt-4 mb-6">
-                    <div className="flex justify-between mb-2">
-                      <span className="text-gray-600">Subtotal</span>
-                      <span className="font-semibold">₹{convertToRupees(getTotalPrice())}</span>
-                    </div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-gray-600">Shipping</span>
-                      <span className="font-semibold">₹99</span>
-                    </div>
-                    <div className="flex justify-between font-semibold text-lg mt-4">
-                      <span>Total</span>
-                      <span>₹{(parseInt(convertToRupees(getTotalPrice())) + 99).toString()}</span>
-                    </div>
-                  </div>
+                      <button 
+                        className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:shadow-md transition-all flex items-center justify-center"
+                        onClick={nextStep}
+                      >
+                        Continue to Shipping
+                        <ChevronRight className="ml-1 w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+                </>
+              )}
 
+              {checkoutStep === 2 && (
+                <>
                   <div className="mb-6">
-                    <div className="flex items-start mb-2">
+                    <div className="flex items-start mb-4">
                       <MapPin className="w-4 h-4 text-gray-500 mt-1 mr-2" />
-                      <div>
+                      <div className="flex-1">
                         <h3 className="font-medium text-sm mb-2">Shipping Address</h3>
-                        <input 
-                          type="text" 
+                        <textarea 
                           value={shippingAddress}
                           onChange={(e) => setShippingAddress(e.target.value)}
-                          placeholder="Enter your shipping address"
-                          className="w-full p-2 border border-border rounded-md text-sm"
+                          placeholder="Enter your full shipping address"
+                          className="w-full p-2 border border-border rounded-md text-sm h-24"
                         />
                       </div>
                     </div>
+                    
                     <div className="flex items-start mt-4">
                       <Clock className="w-4 h-4 text-gray-500 mt-1 mr-2" />
                       <div>
@@ -287,11 +358,116 @@ const Cart: React.FC = () => {
                     </div>
                   </div>
 
+                  <div className="border-t border-border pt-4 mb-6">
+                    <div className="flex justify-between mb-2">
+                      <span className="text-gray-600">Total</span>
+                      <span className="font-semibold">₹{(parseInt(convertToRupees(getTotalPrice())) + 99).toString()}</span>
+                    </div>
+                  </div>
+
+                  <button 
+                    className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:shadow-md transition-all flex items-center justify-center"
+                    onClick={nextStep}
+                  >
+                    Continue to Payment
+                    <ChevronRight className="ml-1 w-4 h-4" />
+                  </button>
+                </>
+              )}
+
+              {checkoutStep === 3 && (
+                <>
+                  <div className="mb-6">
+                    <h3 className="font-medium mb-4 flex items-center">
+                      <CreditCard className="w-4 h-4 text-gray-500 mr-2" />
+                      Select Payment Method
+                    </h3>
+                    
+                    <PaymentMethods
+                      selectedMethod={paymentMethod}
+                      onChange={setPaymentMethod}
+                    />
+                    
+                    {paymentMethod === 'card' && (
+                      <div className="mt-4 space-y-3 border-t border-border pt-4">
+                        <div>
+                          <label className="text-sm mb-1 block">Card Number</label>
+                          <input 
+                            type="text" 
+                            placeholder="1234 5678 9012 3456"
+                            className="w-full p-2 border border-border rounded-md text-sm"
+                          />
+                        </div>
+                        <div className="flex space-x-3">
+                          <div className="flex-1">
+                            <label className="text-sm mb-1 block">Expiry Date</label>
+                            <input 
+                              type="text" 
+                              placeholder="MM/YY"
+                              className="w-full p-2 border border-border rounded-md text-sm"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <label className="text-sm mb-1 block">CVV</label>
+                            <input 
+                              type="text" 
+                              placeholder="123"
+                              className="w-full p-2 border border-border rounded-md text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-sm mb-1 block">Name on Card</label>
+                          <input 
+                            type="text" 
+                            placeholder="John Doe"
+                            className="w-full p-2 border border-border rounded-md text-sm"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {paymentMethod === 'upi' && (
+                      <div className="mt-4 space-y-3 border-t border-border pt-4">
+                        <div>
+                          <label className="text-sm mb-1 block">UPI ID</label>
+                          <input 
+                            type="text" 
+                            placeholder="username@upi"
+                            className="w-full p-2 border border-border rounded-md text-sm"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {paymentMethod === 'bank' && (
+                      <div className="mt-4 space-y-3 border-t border-border pt-4">
+                        <div>
+                          <label className="text-sm mb-1 block">Select Bank</label>
+                          <select className="w-full p-2 border border-border rounded-md text-sm">
+                            <option>State Bank of India</option>
+                            <option>HDFC Bank</option>
+                            <option>ICICI Bank</option>
+                            <option>Axis Bank</option>
+                            <option>Punjab National Bank</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="border-t border-border pt-4 mb-6">
+                    <div className="flex justify-between mb-2">
+                      <span className="text-gray-600">Total Amount</span>
+                      <span className="font-semibold">₹{(parseInt(convertToRupees(getTotalPrice())) + 99).toString()}</span>
+                    </div>
+                  </div>
+
                   <button 
                     className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:shadow-md transition-all"
                     onClick={handleCheckout}
                   >
-                    Complete Purchase
+                    Complete Payment
                   </button>
                 </>
               )}

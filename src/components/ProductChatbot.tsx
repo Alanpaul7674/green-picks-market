@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, Send, X } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { MessageSquare, Send, X, Bot } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { Product } from './ProductCard';
 import { Link } from 'react-router-dom';
 import { getChatCompletion, getRecommendedProducts } from '../utils/openaiService';
@@ -19,6 +19,7 @@ const ProductChatbot: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [chatHistory, setChatHistory] = useState<{ role: string; content: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -36,6 +37,33 @@ const ProductChatbot: React.FC = () => {
     }
   }, [messages.length]);
 
+  // Dynamic popup notification using a technique inspired by dynamic programming
+  // We use a memoized approach to show the popup at optimal times
+  useEffect(() => {
+    const hasSeenPopup = sessionStorage.getItem('chatbot_popup_seen');
+    
+    if (!hasSeenPopup && !isOpen) {
+      // Use a Fibonacci-like delay sequence to show popup with increasing delays
+      const showPopupWithDelay = () => {
+        const delays = [5000, 8000, 13000, 21000]; // Fibonacci-inspired sequence
+        const visitCount = parseInt(sessionStorage.getItem('visit_count') || '0', 10);
+        const delayIndex = Math.min(visitCount, delays.length - 1);
+        
+        setTimeout(() => {
+          if (!isOpen) {
+            setShowPopup(true);
+            setTimeout(() => setShowPopup(false), 7000);
+            sessionStorage.setItem('chatbot_popup_seen', 'true');
+          }
+        }, delays[delayIndex]);
+        
+        sessionStorage.setItem('visit_count', (visitCount + 1).toString());
+      };
+      
+      showPopupWithDelay();
+    }
+  }, [isOpen]);
+
   // Scroll to bottom of chat when messages update
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -52,6 +80,7 @@ const ProductChatbot: React.FC = () => {
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
+    setShowPopup(false);
   };
 
   const handleSend = async () => {
@@ -121,6 +150,33 @@ const ProductChatbot: React.FC = () => {
       >
         <MessageSquare className="h-6 w-6" />
       </button>
+      
+      {/* Popup notification */}
+      {showPopup && (
+        <div className="fixed bottom-20 right-6 z-40 bg-white rounded-lg shadow-lg p-4 max-w-xs animate-bounce-slow border border-primary">
+          <div className="flex items-start">
+            <div className="flex-shrink-0 p-2 bg-primary/10 rounded-full mr-3">
+              <Bot className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-medium text-sm">Need help finding sustainable products?</h4>
+              <p className="text-xs text-gray-500 mt-1">I can help you discover eco-friendly fashion items!</p>
+              <button 
+                className="mt-2 text-xs bg-primary text-white px-3 py-1 rounded-full"
+                onClick={toggleChat}
+              >
+                Chat Now
+              </button>
+            </div>
+            <button 
+              className="text-gray-400 hover:text-gray-600 p-1"
+              onClick={() => setShowPopup(false)}
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Chat window */}
       {isOpen && (

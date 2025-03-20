@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -34,7 +35,7 @@ const ProductPage = () => {
             setProduct(productWithSavedImage);
             
             // Get related products for the specific product type
-            const related = getRelatedProducts(productWithSavedImage);
+            const related = getRelatedProducts(productWithSavedImage, false);
             
             // Ensure we have at least some related products
             if (related.length < 3) {
@@ -57,7 +58,7 @@ const ProductPage = () => {
             setProduct(productData);
             
             // Get related products (same as above)
-            const related = getRelatedProducts(productData);
+            const related = getRelatedProducts(productData, false);
             
             if (related.length < 3) {
               const moreProducts = getRelatedProducts(productData, true);
