@@ -569,7 +569,8 @@ export const products: Product[] = [
     image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?q=80&w=1349&auto=format&fit=crop",
     category: "Women",
     carbonFootprint: 6.7,
-    isSustainable: true
+    isSustainable: true,
+    isNew: true
   },
   {
     id: 57,
@@ -693,6 +694,206 @@ export const products: Product[] = [
     category: "Accessories",
     carbonFootprint: 2.2,
     isSustainable: true
+  },
+  {
+    id: 69,
+    name: "Organic Cotton T-Shirt - Navy",
+    brand: "EcoBasics",
+    price: 29.99,
+    image: "https://images.unsplash.com/photo-1618354691551-44de113f0164?ixlib=rb-4.0.3&auto=format&fit=crop&w=1480&q=80",
+    category: "Women",
+    carbonFootprint: 4.0,
+    isSustainable: true
+  },
+  {
+    id: 70,
+    name: "Organic Cotton T-Shirt - Green",
+    brand: "EcoBasics",
+    price: 29.99,
+    image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1480&q=80",
+    category: "Women",
+    carbonFootprint: 3.9,
+    isSustainable: true
+  },
+  {
+    id: 71,
+    name: "Recycled Denim Jeans - Stonewash",
+    brand: "GreenThread",
+    price: 89.99,
+    image: "https://images.unsplash.com/photo-1600717535275-0b18ede2f7fc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80",
+    category: "Women",
+    carbonFootprint: 7.2,
+    isSustainable: true
+  },
+  {
+    id: 72,
+    name: "Hemp Blend Jacket - Beige",
+    brand: "NatureWear",
+    price: 149.99,
+    image: "https://images.unsplash.com/photo-1548624313-0396c75d8918?ixlib=rb-4.0.3&auto=format&fit=crop&w=1336&q=80",
+    category: "Women",
+    carbonFootprint: 9.5,
+    isNew: true
+  },
+  {
+    id: 73,
+    name: "Bamboo Lounge Pants - Grey",
+    brand: "EcoBasics",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80",
+    category: "Women",
+    carbonFootprint: 3.3,
+    isSustainable: true
+  },
+  {
+    id: 74,
+    name: "Recycled Polyester Shirt - Blue",
+    brand: "GreenThread",
+    price: 45.99,
+    image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+    category: "Men",
+    carbonFootprint: 5.9
+  },
+  {
+    id: 75,
+    name: "Organic Cotton Oxford Shirt - Blue",
+    brand: "GreenThread",
+    price: 44.99,
+    image: "https://images.unsplash.com/photo-1588359348347-9bc6cbbb689e?q=80&w=1471&auto=format&fit=crop",
+    category: "Men",
+    carbonFootprint: 3.3,
+    isSustainable: true
+  },
+  {
+    id: 76,
+    name: "Organic Cotton Oxford Shirt - White",
+    brand: "GreenThread",
+    price: 44.99,
+    image: "https://images.unsplash.com/photo-1598032895397-b9472444bf93?q=80&w=1470&auto=format&fit=crop",
+    category: "Men",
+    carbonFootprint: 3.2,
+    isSustainable: true
+  },
+  {
+    id: 77,
+    name: "Hemp Button-Down Shirt - Olive",
+    brand: "GreenThread",
+    price: 45.99,
+    image: "https://images.unsplash.com/photo-1607345366928-199ea26cfe3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80",
+    category: "Men",
+    carbonFootprint: 3.0,
+    isSustainable: true
+  },
+  {
+    id: 78,
+    name: "Bamboo Casual Shirt - Beige",
+    brand: "NatureWear",
+    price: 42.99,
+    image: "https://images.unsplash.com/photo-1721159574232-e1abcaab8307?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80",
+    category: "Men",
+    carbonFootprint: 2.7,
+    isSustainable: true,
+    isNew: true
+  },
+  {
+    id: 79,
+    name: "Sustainable Wool Sweater - Grey",
+    brand: "NatureWear",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?ixlib=rb-4.0.3&auto=format&fit=crop&w=1372&q=80",
+    category: "Men",
+    carbonFootprint: 10.0,
+    isNew: true
+  },
+  {
+    id: 80,
+    name: "Organic Linen Blazer - Black",
+    brand: "EcoBasics",
+    price: 189.99,
+    image: "https://images.unsplash.com/photo-1591987637258-4donne84f000?ixlib=rb-4.0.3&auto=format&fit=crop&w=1338&q=80",
+    category: "Women",
+    carbonFootprint: 7.8,
+    isSustainable: true
+  },
+  {
+    id: 81,
+    name: "Recycled Nylon Jacket - Olive",
+    brand: "GreenThread",
+    price: 159.99,
+    image: "https://images.unsplash.com/photo-1556740765-2f8f76a44b8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1480&q=80",
+    category: "Men",
+    carbonFootprint: 10.8
+  },
+  {
+    id: 82,
+    name: "Tencel Wrap Dress - Burgundy",
+    brand: "NatureWear",
+    price: 119.99,
+    image: "https://images.unsplash.com/photo-1548624313-0396c75d8918?ixlib=rb-4.0.3&auto=format&fit=crop&w=1380&q=80",
+    category: "Women",
+    carbonFootprint: 5.7,
+    isSustainable: true,
+    isNew: true
+  },
+  {
+    id: 83,
+    name: "Eco-Friendly Sneakers - Black",
+    brand: "EcoBasics",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1480&q=80",
+    category: "Accessories",
+    carbonFootprint: 7.5,
+    isSustainable: true
+  },
+  {
+    id: 84,
+    name: "Organic Cotton Blouse - Blue Stripe",
+    brand: "EcoBasics",
+    price: 35.99,
+    image: "https://images.unsplash.com/photo-1512850183-6d7990f42385?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80",
+    category: "Women",
+    carbonFootprint: 3.6,
+    isSustainable: true
+  },
+  {
+    id: 85,
+    name: "Bamboo Fiber Shirt - Sage",
+    brand: "GreenThread",
+    price: 42.99,
+    image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+    category: "Women",
+    carbonFootprint: 3.0,
+    isSustainable: true
+  },
+  {
+    id: 86,
+    name: "Hemp Blend Shirt - Terracotta",
+    brand: "NatureWear",
+    price: 39.99,
+    image: "https://images.unsplash.com/photo-1603344797033-f0f4f587ab60?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80",
+    category: "Women",
+    carbonFootprint: 2.7,
+    isSustainable: true
+  },
+  {
+    id: 87,
+    name: "Linen Button-Up Shirt - Olive",
+    brand: "EcoBasics",
+    price: 44.99,
+    image: "https://images.unsplash.com/photo-1644322478368-c18082ac6fc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+    category: "Women",
+    carbonFootprint: 3.2,
+    isSustainable: true
+  },
+  {
+    id: 88,
+    name: "Sustainable Chino Pants - Khaki",
+    brand: "EcoBasics",
+    price: 89.99,
+    image: "https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1374&q=80",
+    category: "Men",
+    carbonFootprint: 7.0,
+    isSustainable: true
   }
 ];
 
@@ -700,11 +901,18 @@ export const getProductById = (id: number): Product | undefined => {
   return products.find(product => product.id === id);
 };
 
-export const getRelatedProducts = (product: Product, limit: number = 6): Product[] => {
+export const getRelatedProducts = (product: Product, allCategory: boolean = false): Product[] => {
+  if (allCategory) {
+    return products
+      .filter(p => p.id !== product.id && p.category === product.category)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 8);
+  }
+  
   return products
     .filter(p => p.id !== product.id && (p.category === product.category || p.brand === product.brand))
     .sort(() => Math.random() - 0.5)
-    .slice(0, limit);
+    .slice(0, 6);
 };
 
 export const getFeaturedProducts = (limit: number = 4): Product[] => {
