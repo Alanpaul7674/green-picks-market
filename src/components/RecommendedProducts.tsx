@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import ProductCard, { Product } from './ProductCard';
 import { ChevronLeft, ChevronRight, Leaf } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { getProductById } from '../utils/productData';
 
 interface RecommendedProductsProps {
   products: Product[];
@@ -18,6 +19,7 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const [showEmptyState, setShowEmptyState] = useState(false);
+  const [fallbackProducts, setFallbackProducts] = useState<Product[]>([]);
   
   // Helper function to check if products are actually shirts
   const isShirt = (product: Product) => {
@@ -33,34 +35,16 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
         currentProduct.name.toLowerCase().includes('trouser')) return 'pant';
     if (currentProduct.name.toLowerCase().includes('jacket') || 
         currentProduct.name.toLowerCase().includes('coat')) return 'jacket';
+    if (currentProduct.name.toLowerCase().includes('shoe') || 
+        currentProduct.name.toLowerCase().includes('boot') ||
+        currentProduct.name.toLowerCase().includes('sneaker')) return 'footwear';
     return currentProduct.category;
   };
 
   const specificCategory = getSpecificCategory();
 
-  useEffect(() => {
-    // If there are no recommendations, show empty state after a short delay
-    if (recommendations.length === 0) {
-      const timer = setTimeout(() => setShowEmptyState(true), 500);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const { current: container } = scrollContainerRef;
-      const scrollAmount = container.clientWidth * 0.6;
-      
-      if (direction === 'left') {
-        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-      } else {
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    }
-  };
-
   // Filter recommendations based on specific product type and lower carbon footprint
-  const recommendations = products.filter(p => {
+  const exactTypeRecommendations = products.filter(p => {
     // Don't include the current product
     if (p.id === currentProduct.id) return false;
     
@@ -80,34 +64,66 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
     if (specificCategory === 'jacket' && 
         !(p.name.toLowerCase().includes('jacket') || 
           p.name.toLowerCase().includes('coat'))) return false;
+          
+    // If current product is footwear, suggest other footwear
+    if (specificCategory === 'footwear' && 
+        !(p.name.toLowerCase().includes('shoe') || 
+          p.name.toLowerCase().includes('boot') ||
+          p.name.toLowerCase().includes('sneaker'))) return false;
     
     // Must have lower carbon footprint
     return p.carbonFootprint < currentProduct.carbonFootprint;
   });
 
-  // Calculate potential carbon savings
+  // Fallback: related products of same category without carbon footprint restriction
+  const sameTypeRecommendations = products.filter(p => {
+    if (p.id === currentProduct.id) return false;
+    if (p.category !== currentProduct.category) return false;
+    
+    if (specificCategory === 'shirt' && !isShirt(p)) return false;
+    if (specificCategory === 'pant' && 
+        !(p.name.toLowerCase().includes('pant') || 
+          p.name.toLowerCase().includes('jean') || 
+          p.name.toLowerCase().includes('trouser'))) return false;
+    if (specificCategory === 'jacket' && 
+        !(p.name.toLowerCase().includes('jacket') || 
+          p.name.toLowerCase().includes('coat'))) return false;
+    if (specificCategory === 'footwear' && 
+        !(p.name.toLowerCase().includes('shoe') || 
+          p.name.toLowerCase().includes('boot') ||
+          p.name.toLowerCase().includes('sneaker'))) return false;
+    
+    return true;
+  });
+  
+  // Final fallback: just related products of same category
+  const categoryRecommendations = products.filter(p => {
+    return p.id !== currentProduct.id && p.category === currentProduct.category;
+  });
+
+  // Use our recommendations or fallbacks
+  const recommendations = exactTypeRecommendations.length > 0 
+    ? exactTypeRecommendations 
+    : (sameTypeRecommendations.length > 0 ? sameTypeRecommendations : categoryRecommendations);
+
+  // Calculate potential carbon savings (or 0 if the product has higher footprint)
   const calculateSavings = (product: Product) => {
-    return (currentProduct.carbonFootprint - product.carbonFootprint).toFixed(1);
+    const saving = currentProduct.carbonFootprint - product.carbonFootprint;
+    return saving > 0 ? saving.toFixed(1) : "0.0";
   };
 
-  if (recommendations.length === 0) {
-    if (!showEmptyState) return null;
-    
-    return (
-      <div className="relative py-10">
-        <h2 className="text-xl font-semibold mb-4">{title}</h2>
-        <div className="bg-accent p-6 rounded-lg text-center">
-          <Leaf className="w-10 h-10 text-primary mx-auto mb-4" />
-          <h3 className="text-lg font-medium mb-2">No Lower Carbon Alternatives Found</h3>
-          <p className="text-gray-600 mb-4">
-            This {specificCategory === currentProduct.category ? 
-              currentProduct.category.toLowerCase() : 
-              specificCategory} already has one of the lowest carbon footprints!
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const { current: container } = scrollContainerRef;
+      const scrollAmount = container.clientWidth * 0.6;
+      
+      if (direction === 'left') {
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      } else {
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    }
+  };
 
   // Show toast highlighting sustainability benefits
   const showSustainabilityToast = () => {
@@ -141,10 +157,21 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
 
   // Determine the subtitle based on the specific category
   const getSubtitle = () => {
-    if (specificCategory === currentProduct.category) {
-      return `Similar ${currentProduct.category.toLowerCase()} with lower carbon footprint`;
-    } else {
+    if (exactTypeRecommendations.length > 0) {
       return `Similar ${specificCategory}s with lower carbon footprint`;
+    } else if (sameTypeRecommendations.length > 0) {
+      return `Related ${specificCategory}s you might like`;
+    } else {
+      return `Other items from ${currentProduct.category} collection`;
+    }
+  };
+
+  // If we're using fallback recommendations, adjust the title
+  const getTitle = () => {
+    if (exactTypeRecommendations.length > 0) {
+      return title;
+    } else {
+      return "You Might Also Like";
     }
   };
 
@@ -152,7 +179,7 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
     <div className="relative py-10">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold">{title}</h2>
+          <h2 className="text-xl font-semibold">{getTitle()}</h2>
           <p className="text-sm text-gray-500 mt-1">
             {getSubtitle()}
           </p>
@@ -183,10 +210,12 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
         {recommendations.map(product => (
           <div key={product.id} className="min-w-[280px] max-w-[280px] relative">
             <ProductCard product={product} />
-            <div className="absolute top-3 right-3 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
-              <Leaf className="w-3 h-3 mr-1" />
-              Save {calculateSavings(product)} kg CO2e
-            </div>
+            {product.carbonFootprint < currentProduct.carbonFootprint && (
+              <div className="absolute top-3 right-3 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                <Leaf className="w-3 h-3 mr-1" />
+                Save {calculateSavings(product)} kg CO2e
+              </div>
+            )}
           </div>
         ))}
       </div>

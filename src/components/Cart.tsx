@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { X, ShoppingBag, MapPin, Clock, Trophy, Leaf } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
@@ -83,11 +84,23 @@ const Cart: React.FC = () => {
     return items.reduce((total, item) => total + (item.product.price * item.quantity), 0);
   };
 
-  const getAverageCarbonFootprint = () => {
-    if (items.length === 0) return 0;
-    const totalCarbonFootprint = items.reduce((total, item) => total + (item.product.carbonFootprint * item.quantity), 0);
-    const totalQuantity = items.reduce((total, item) => total + item.quantity, 0);
-    return totalCarbonFootprint / totalQuantity;
+  // Convert price to rupees - similar to ProductCard.tsx
+  const convertToRupees = (price: number) => {
+    return Math.min(1999, Math.round(price * 20)).toFixed(0);
+  };
+
+  const getTotalCarbonFootprint = () => {
+    return items.reduce((total, item) => 
+      total + (item.product.carbonFootprint * item.quantity), 0);
+  };
+
+  const getIndustryCarbonAverage = () => {
+    // A higher number for industry average - assuming typical products have higher footprint
+    return items.reduce((total, item) => total + (item.quantity * 12), 0);
+  };
+
+  const getCarbonSavings = () => {
+    return getIndustryCarbonAverage() - getTotalCarbonFootprint();
   };
 
   const handleCheckout = () => {
@@ -100,17 +113,22 @@ const Cart: React.FC = () => {
       return;
     }
     
-    // Update total sustainability points in localStorage
+    // Update total sustainability points and carbon savings in localStorage
     const currentPoints = parseInt(localStorage.getItem('sustainabilityPoints') || '0', 10);
     const newTotalPoints = currentPoints + sustainabilityPoints;
     localStorage.setItem('sustainabilityPoints', newTotalPoints.toString());
     
+    // Store carbon savings
+    const currentSavings = parseFloat(localStorage.getItem('carbonSavings') || '0');
+    const newTotalSavings = currentSavings + getCarbonSavings();
+    localStorage.setItem('carbonSavings', newTotalSavings.toString());
+    
     toast({
       title: "Order placed successfully!",
-      description: `You've earned ${sustainabilityPoints} sustainability points with this purchase!`,
+      description: `You've saved ${getCarbonSavings().toFixed(1)} kg CO2e with this purchase!`,
       action: (
         <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10">
-          <Trophy className="h-3 w-3 text-primary" />
+          <Leaf className="h-3 w-3 text-primary" />
         </div>
       )
     });
@@ -201,7 +219,7 @@ const Cart: React.FC = () => {
                               </button>
                             </div>
                             <div className="flex items-center">
-                              <span className="font-semibold text-sm">${(item.product.price * item.quantity).toFixed(2)}</span>
+                              <span className="font-semibold text-sm">₹{convertToRupees(item.product.price * item.quantity)}</span>
                               <div className="ml-2">
                                 <CarbonScoreCircle score={item.product.carbonFootprint} size="sm" showLabel={false} />
                               </div>
@@ -214,34 +232,35 @@ const Cart: React.FC = () => {
 
                   <div className="bg-accent p-4 rounded-lg mb-6">
                     <div className="flex items-center mb-3">
-                      <Trophy className="w-4 h-4 text-primary mr-2" />
-                      <h3 className="font-medium">Sustainability Rewards</h3>
+                      <Leaf className="w-4 h-4 text-primary mr-2" />
+                      <h3 className="font-medium">Carbon Impact Summary</h3>
                     </div>
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm">Sustainability Points:</span>
-                      <span className="font-semibold text-primary">{sustainabilityPoints} points</span>
+                      <span className="text-sm">Total Carbon Footprint:</span>
+                      <span className="font-semibold">{getTotalCarbonFootprint().toFixed(1)} kg CO2e</span>
+                    </div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm">Industry Average:</span>
+                      <span className="font-semibold text-gray-500">{getIndustryCarbonAverage().toFixed(1)} kg CO2e</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm">Average Carbon Score:</span>
-                      <div className="flex items-center">
-                        <span className="font-semibold mr-2">{getAverageCarbonFootprint().toFixed(1)}</span>
-                        <Leaf className={`w-4 h-4 ${getAverageCarbonFootprint() < 5 ? 'text-green-500' : getAverageCarbonFootprint() < 10 ? 'text-amber-500' : 'text-red-500'}`} />
-                      </div>
+                      <span className="text-sm">Your Carbon Savings:</span>
+                      <span className="font-semibold text-green-600">{getCarbonSavings().toFixed(1)} kg CO2e</span>
                     </div>
                   </div>
 
                   <div className="border-t border-border pt-4 mb-6">
                     <div className="flex justify-between mb-2">
                       <span className="text-gray-600">Subtotal</span>
-                      <span className="font-semibold">${getTotalPrice().toFixed(2)}</span>
+                      <span className="font-semibold">₹{convertToRupees(getTotalPrice())}</span>
                     </div>
                     <div className="flex justify-between mb-2">
                       <span className="text-gray-600">Shipping</span>
-                      <span className="font-semibold">$4.99</span>
+                      <span className="font-semibold">₹99</span>
                     </div>
                     <div className="flex justify-between font-semibold text-lg mt-4">
                       <span>Total</span>
-                      <span>${(getTotalPrice() + 4.99).toFixed(2)}</span>
+                      <span>₹{(parseInt(convertToRupees(getTotalPrice())) + 99).toString()}</span>
                     </div>
                   </div>
 

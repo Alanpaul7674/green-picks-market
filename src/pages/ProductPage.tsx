@@ -33,10 +33,47 @@ const ProductPage = () => {
               image: savedImage
             };
             setProduct(productWithSavedImage);
-            setRelatedProducts(getRelatedProducts(productWithSavedImage));
+            
+            // Get related products for the specific product type
+            const related = getRelatedProducts(productWithSavedImage);
+            
+            // Ensure we have at least some related products
+            if (related.length < 3) {
+              // Add some more products from the same category if needed
+              const moreProducts = getRelatedProducts(productWithSavedImage, true);
+              const combinedProducts = [...related];
+              
+              // Add products not already in the list until we have at least 4
+              moreProducts.forEach(p => {
+                if (!combinedProducts.some(cp => cp.id === p.id) && combinedProducts.length < 8) {
+                  combinedProducts.push(p);
+                }
+              });
+              
+              setRelatedProducts(combinedProducts);
+            } else {
+              setRelatedProducts(related);
+            }
           } else {
             setProduct(productData);
-            setRelatedProducts(getRelatedProducts(productData));
+            
+            // Get related products (same as above)
+            const related = getRelatedProducts(productData);
+            
+            if (related.length < 3) {
+              const moreProducts = getRelatedProducts(productData, true);
+              const combinedProducts = [...related];
+              
+              moreProducts.forEach(p => {
+                if (!combinedProducts.some(cp => cp.id === p.id) && combinedProducts.length < 8) {
+                  combinedProducts.push(p);
+                }
+              });
+              
+              setRelatedProducts(combinedProducts);
+            } else {
+              setRelatedProducts(related);
+            }
           }
         } else {
           // Product not found

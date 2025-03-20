@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
 import Footer from '../components/Footer';
@@ -10,14 +10,40 @@ import { getFeaturedProducts, getNewArrivals } from '../utils/productData';
 const Index = () => {
   const featuredProducts = getFeaturedProducts(4);
   const newArrivals = getNewArrivals(4);
+  const [carbonSavings, setCarbonSavings] = useState(0);
   
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // Get carbon savings from localStorage
+    const savedCarbonFootprint = localStorage.getItem('carbonSavings');
+    if (savedCarbonFootprint) {
+      setCarbonSavings(parseFloat(savedCarbonFootprint));
+    }
   }, []);
 
   return (
     <div className="min-h-screen">
       <Navbar />
+      
+      {/* Carbon Savings Indicator - Fixed on right side */}
+      {carbonSavings > 0 && (
+        <div className="fixed right-5 top-1/2 transform -translate-y-1/2 z-30">
+          <div className="relative flex flex-col items-center">
+            {/* Circle showing carbon savings */}
+            <div className="w-20 h-20 rounded-full bg-primary/90 text-white shadow-lg flex flex-col items-center justify-center backdrop-blur-sm border-2 border-white">
+              <span className="text-sm font-medium">You Saved</span>
+              <span className="text-lg font-bold">{carbonSavings.toFixed(1)}</span>
+              <span className="text-xs">kg CO2e</span>
+            </div>
+            
+            {/* Leaf icon */}
+            <div className="absolute -top-3 -right-2 bg-white rounded-full p-2 shadow-md">
+              <Leaf className="w-4 h-4 text-primary" />
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Hero Section */}
       <Hero />
